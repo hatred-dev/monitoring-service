@@ -45,7 +45,7 @@ func TestCreateMultipleProjects(t *testing.T) {
 			t.Error(err)
 		}
 	}
-	projects, err := queries.ListProjects(ctx)
+	projects, err := queries.GetProjects(ctx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -63,9 +63,64 @@ func TestProjectsDelete(t *testing.T) {
 			t.Error(err)
 		}
 	}
-	projects, err := queries.ListProjects(ctx)
+	projects, err := queries.GetProjects(ctx)
 	if err != nil {
 		t.Error(err)
 	}
 	assert.Equal(t, len(projects), 0)
+}
+
+func TestInsertIP(t *testing.T) {
+	createDB()
+	defer dropDB()
+
+	ctx := context.Background()
+	queries := database.New(dbConnection)
+	project, err := queries.CreateProject(ctx, database.CreateProjectParams{
+		ProjectName: "test_project",
+		Active: sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		},
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	ip, err := queries.CreateIP(ctx, database.CreateIPParams{
+		ProjectID: project.ID,
+		Ip:        "1.1.1.1",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(ip)
+}
+
+func TestCascadeDelete(t *testing.T) {
+	createDB()
+	defer dropDB()
+
+	ctx := context.Background()
+	queries := database.New(dbConnection)
+	project, err := queries.CreateProject(ctx, database.CreateProjectParams{
+		ProjectName: "test_project",
+		Active: sql.NullBool{
+			Bool:  true,
+			Valid: true,
+		},
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	ip, err := queries.CreateIP(ctx, database.CreateIPParams{
+		ProjectID: project.ID,
+		Ip:        "1.1.1.1",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Println(ip)
+	err = queries.DeleteProject(ctx, project.ProjectName)
+	ips, err := queries.GetAllIPs(ctx)
+	assert.Equal(t, len(ips), 0)
 }

@@ -55,14 +55,14 @@ func (q *Queries) GetProjectByName(ctx context.Context, projectName string) (Pro
 	return i, err
 }
 
-const listProjects = `-- name: ListProjects :many
+const getProjects = `-- name: GetProjects :many
 SELECT id, project_name, active
 FROM projects
 ORDER BY project_name
 `
 
-func (q *Queries) ListProjects(ctx context.Context) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, listProjects)
+func (q *Queries) GetProjects(ctx context.Context) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getProjects)
 	if err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const createIP = `-- name: CreateIP :exec
+const createIP = `-- name: CreateIP :one
 INSERT INTO ip_address (project_id, ip)
 VALUES ($1, $2)
 RETURNING id, project_id, ip
@@ -22,9 +22,39 @@ type CreateIPParams struct {
 	Ip        string
 }
 
-func (q *Queries) CreateIP(ctx context.Context, arg CreateIPParams) error {
-	_, err := q.db.ExecContext(ctx, createIP, arg.ProjectID, arg.Ip)
-	return err
+func (q *Queries) CreateIP(ctx context.Context, arg CreateIPParams) (IpAddress, error) {
+	row := q.db.QueryRowContext(ctx, createIP, arg.ProjectID, arg.Ip)
+	var i IpAddress
+	err := row.Scan(&i.ID, &i.ProjectID, &i.Ip)
+	return i, err
+}
+
+const getAllIPs = `-- name: GetAllIPs :many
+SELECT id, project_id, ip
+FROM ip_address
+`
+
+func (q *Queries) GetAllIPs(ctx context.Context) ([]IpAddress, error) {
+	rows, err := q.db.QueryContext(ctx, getAllIPs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []IpAddress
+	for rows.Next() {
+		var i IpAddress
+		if err := rows.Scan(&i.ID, &i.ProjectID, &i.Ip); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getIPs = `-- name: GetIPs :many
