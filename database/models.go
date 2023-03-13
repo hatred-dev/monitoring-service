@@ -11,19 +11,20 @@ import (
 )
 
 type IpAddress struct {
-	ID          uuid.UUID
-	ProjectName string
-	Ip          string
+	ID        uuid.UUID
+	ProjectID uuid.UUID
+	Ip        string
 }
 
 type Project struct {
+	ID          uuid.UUID
 	ProjectName string
 	Active      sql.NullBool
 }
 
 type Service struct {
 	ID          uuid.UUID
-	ProjectName string
+	ProjectID   uuid.UUID
 	ServiceName string
 	Url         string
 }

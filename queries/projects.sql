@@ -23,9 +23,9 @@ WHERE project_name = $1;
 UPDATE projects
 SET project_name = $2,
     active       = $3
-WHERE project_name = $1;
+WHERE id = $1;
 
--- name: ProjectSetActive :exec
+-- name: ProjectSetState :exec
 UPDATE projects
 SET active = $2
 WHERE project_name = $1;
