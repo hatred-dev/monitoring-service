@@ -1,10 +1,11 @@
--- name: GetProject :one
+-- name: GetProjectByName :one
 SELECT *
 FROM projects
 WHERE project_name = $1
 LIMIT 1;
 
--- name: ListProjects :many
+
+-- name: GetProjects :many
 SELECT *
 FROM projects
 ORDER BY project_name;
