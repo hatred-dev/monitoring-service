@@ -9,8 +9,26 @@ func CreateRouter() *gin.Engine {
 	r := gin.Default()
 	apiGroup := r.Group("/api")
 	{
-		apiGroup.POST("/projects", handlers.HandleCreateProject)
-		apiGroup.GET("/projects", handlers.HandleGetProjects)
+		projects := apiGroup.Group("/projects")
+		{
+			projects.POST("/", handlers.HandleCreateProject)
+			projects.GET("/", handlers.HandleGetProjects)
+			projects.GET("/:project_name", handlers.HandleGetProjectByName)
+			projects.DELETE("/", handlers.HandleDeleteProject)
+			projects.PATCH("/", handlers.HandlePatchProject)
+		}
+		services := apiGroup.Group("/services")
+		{
+			services.POST("/", handlers.HandleCreateService)
+			services.GET("/", handlers.HandleGetServices)
+			services.GET("/:project_name", handlers.HandleGetServicesByProjectName)
+			services.DELETE("/", handlers.HandleDeleteService)
+		}
+		ips := apiGroup.Group("/ips")
+		{
+			ips.POST("/", handlers.HandleCreateIP)
+			ips.PATCH("/", handlers.HandleUpdateIP)
+		}
 	}
 	return r
 }
