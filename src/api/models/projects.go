@@ -11,13 +11,12 @@ type CreateProjectResponse struct {
 	Active      bool   `json:"active"`
 }
 
-type CreateServiceRequest struct {
-	ProjectName string `json:"project_name"`
-	ServiceName string `json:"service_name"`
-	Url         string `json:"url"`
+type PatchProjectRequest struct {
+	ProjectName    string `json:"project_name" binding:"required"`
+	NewProjectName string `json:"new_project_name" binding:"required"`
+	Active         bool   `json:"active"`
 }
 
-type AddIpAddressRequest struct {
-	ProjectName string `json:"project_name"`
-	Ip          string `json:"ip"`
+type DeleteProjectRequest struct {
+	ProjectName string `json:"project_name" binding:"required"`
 }
