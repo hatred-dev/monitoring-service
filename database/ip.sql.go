@@ -13,17 +13,17 @@ import (
 
 const createIP = `-- name: CreateIP :one
 INSERT INTO ip_address (project_id, ip)
-VALUES ($1, $2)
+VALUES ((SELECT p.id FROM projects p WHERE p.project_name = $1), $2)
 RETURNING id, project_id, ip
 `
 
 type CreateIPParams struct {
-	ProjectID uuid.UUID
-	Ip        string
+	ProjectName string `json:"project_name"`
+	Ip          string `json:"ip"`
 }
 
 func (q *Queries) CreateIP(ctx context.Context, arg CreateIPParams) (IpAddress, error) {
-	row := q.db.QueryRowContext(ctx, createIP, arg.ProjectID, arg.Ip)
+	row := q.db.QueryRowContext(ctx, createIP, arg.ProjectName, arg.Ip)
 	var i IpAddress
 	err := row.Scan(&i.ID, &i.ProjectID, &i.Ip)
 	return i, err
@@ -86,18 +86,29 @@ func (q *Queries) GetIPs(ctx context.Context, projectID uuid.UUID) ([]IpAddress,
 	return items, nil
 }
 
+const iPExists = `-- name: IPExists :one
+SELECT EXISTS(SELECT 1 from ip_address where ip = $1)
+`
+
+func (q *Queries) IPExists(ctx context.Context, ip string) (bool, error) {
+	row := q.db.QueryRowContext(ctx, iPExists, ip)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const updateIP = `-- name: UpdateIP :exec
 UPDATE ip_address
 SET ip = $2
-WHERE id = $1
+WHERE id = (SELECT i.id FROM ip_address i WHERE i.ip = $1)
 `
 
 type UpdateIPParams struct {
-	ID uuid.UUID
-	Ip string
+	Ip   string `json:"ip"`
+	Ip_2 string `json:"ip_2"`
 }
 
 func (q *Queries) UpdateIP(ctx context.Context, arg UpdateIPParams) error {
-	_, err := q.db.ExecContext(ctx, updateIP, arg.ID, arg.Ip)
+	_, err := q.db.ExecContext(ctx, updateIP, arg.Ip, arg.Ip_2)
 	return err
 }

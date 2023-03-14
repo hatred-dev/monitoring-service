@@ -5,23 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2bba852b-3e2b-4f32-8d06-9201bd21e540" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/database/globals.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/api/handlers/handlers.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/api/models/models.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/api/router/router.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/configuration/configuration.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/configuration/helpers.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/api/helpers/helpers.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/ip.sql.go" beforeDir="false" afterPath="$PROJECT_DIR$/database/ip.sql.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/models.go" beforeDir="false" afterPath="$PROJECT_DIR$/database/models.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/projects.sql.go" beforeDir="false" afterPath="$PROJECT_DIR$/database/projects.sql.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/services.sql.go" beforeDir="false" afterPath="$PROJECT_DIR$/database/services.sql.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/queries/ip.sql" beforeDir="false" afterPath="$PROJECT_DIR$/queries/ip.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/queries/projects.sql" beforeDir="false" afterPath="$PROJECT_DIR$/queries/projects.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/queries/services.sql" beforeDir="false" afterPath="$PROJECT_DIR$/queries/services.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/sqlc.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/sqlc.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/healthcheck.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/healthcheck.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/database_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/tests/database_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/handlers/helpers.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/handlers/ips.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/handlers/projects.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/handlers/projects.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/handlers/services.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/handlers/services.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/models/ips.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/models/ips.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/router/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +40,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://C:/Program Files/Go/src/time/sleep.go" root0="SKIP_INSPECTION" />
     <setting file="file://C:/Program Files/Go/src/time/time.go" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/go/pkg/mod/github.com/gin-gonic/gin@v1.9.0/binding/binding_msgpack_test.go" root0="SKIP_INSPECTION" />
   </component>
   <component name="MacroExpansionManager">
     <option name="directoryName" value="t3j5l3fb" />
@@ -73,7 +72,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -85,7 +84,20 @@
     ]
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="G:\Go\monitoring-service\src\api\helpers" />
+    </key>
+  </component>
   <component name="RunManager" selected="Go Build.go build monitoring-service">
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="monitoring-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build monitoring-service" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="monitoring-service" />
       <working_directory value="$PROJECT_DIR$" />
@@ -131,6 +143,15 @@
       <pattern value="^\QTestInsertIP\E$" />
       <method v="2" />
     </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="monitoring-service" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <configuration name="go test monitoring-service/tests" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="monitoring-service" />
       <working_directory value="$PROJECT_DIR$/tests" />
@@ -164,6 +185,9 @@
       <workItem from="1678446558537" duration="577000" />
       <workItem from="1678447175280" duration="17688000" />
       <workItem from="1678704660821" duration="19339000" />
+      <workItem from="1678741953813" duration="370000" />
+      <workItem from="1678742347699" duration="65000" />
+      <workItem from="1678796438738" duration="19241000" />
     </task>
     <servers />
   </component>

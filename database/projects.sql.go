@@ -8,8 +8,6 @@ package database
 import (
 	"context"
 	"database/sql"
-
-	"github.com/google/uuid"
 )
 
 const createProject = `-- name: CreateProject :one
@@ -19,8 +17,8 @@ RETURNING id, project_name, active
 `
 
 type CreateProjectParams struct {
-	ProjectName string
-	Active      sql.NullBool
+	ProjectName string       `json:"project_name"`
+	Active      sql.NullBool `json:"active"`
 }
 
 func (q *Queries) CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error) {
@@ -84,6 +82,17 @@ func (q *Queries) GetProjects(ctx context.Context) ([]Project, error) {
 	return items, nil
 }
 
+const projectExists = `-- name: ProjectExists :one
+SELECT EXISTS(SELECT 1 FROM projects p WHERE p.project_name = $1)
+`
+
+func (q *Queries) ProjectExists(ctx context.Context, projectName string) (bool, error) {
+	row := q.db.QueryRowContext(ctx, projectExists, projectName)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const projectSetState = `-- name: ProjectSetState :exec
 UPDATE projects
 SET active = $2
@@ -91,8 +100,8 @@ WHERE project_name = $1
 `
 
 type ProjectSetStateParams struct {
-	ProjectName string
-	Active      sql.NullBool
+	ProjectName string       `json:"project_name"`
+	Active      sql.NullBool `json:"active"`
 }
 
 func (q *Queries) ProjectSetState(ctx context.Context, arg ProjectSetStateParams) error {
@@ -104,16 +113,16 @@ const updateProject = `-- name: UpdateProject :exec
 UPDATE projects
 SET project_name = $2,
     active       = $3
-WHERE id = $1
+WHERE id = (SELECT id FROM projects p WHERE p.project_name = $1)
 `
 
 type UpdateProjectParams struct {
-	ID          uuid.UUID
-	ProjectName string
-	Active      sql.NullBool
+	ProjectName   string       `json:"project_name"`
+	ProjectName_2 string       `json:"project_name_2"`
+	Active        sql.NullBool `json:"active"`
 }
 
 func (q *Queries) UpdateProject(ctx context.Context, arg UpdateProjectParams) error {
-	_, err := q.db.ExecContext(ctx, updateProject, arg.ID, arg.ProjectName, arg.Active)
+	_, err := q.db.ExecContext(ctx, updateProject, arg.ProjectName, arg.ProjectName_2, arg.Active)
 	return err
 }

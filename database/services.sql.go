@@ -11,37 +11,44 @@ import (
 	"github.com/google/uuid"
 )
 
-const createService = `-- name: CreateService :exec
+const createService = `-- name: CreateService :one
 INSERT INTO services (project_id, service_name, url)
-VALUES ($1, $2, $3)
+VALUES ((SELECT id FROM projects WHERE project_name = $1), $2, $3)
 RETURNING id, project_id, service_name, url
 `
 
 type CreateServiceParams struct {
-	ProjectID   uuid.UUID
-	ServiceName string
-	Url         string
+	ProjectName string `json:"project_name"`
+	ServiceName string `json:"service_name"`
+	Url         string `json:"url"`
 }
 
-func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) error {
-	_, err := q.db.ExecContext(ctx, createService, arg.ProjectID, arg.ServiceName, arg.Url)
-	return err
+func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) (Service, error) {
+	row := q.db.QueryRowContext(ctx, createService, arg.ProjectName, arg.ServiceName, arg.Url)
+	var i Service
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.ServiceName,
+		&i.Url,
+	)
+	return i, err
 }
 
 const deleteService = `-- name: DeleteService :exec
 DELETE
 FROM services
-WHERE project_id = $1
+WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
   AND service_name = $2
 `
 
 type DeleteServiceParams struct {
-	ProjectID   uuid.UUID
-	ServiceName string
+	ProjectName string `json:"project_name"`
+	ServiceName string `json:"service_name"`
 }
 
 func (q *Queries) DeleteService(ctx context.Context, arg DeleteServiceParams) error {
-	_, err := q.db.ExecContext(ctx, deleteService, arg.ProjectID, arg.ServiceName)
+	_, err := q.db.ExecContext(ctx, deleteService, arg.ProjectName, arg.ServiceName)
 	return err
 }
 
@@ -54,8 +61,8 @@ LIMIT 1
 `
 
 type GetServiceParams struct {
-	ProjectID   uuid.UUID
-	ServiceName string
+	ProjectID   uuid.UUID `json:"project_id"`
+	ServiceName string    `json:"service_name"`
 }
 
 func (q *Queries) GetService(ctx context.Context, arg GetServiceParams) (Service, error) {
@@ -71,13 +78,54 @@ func (q *Queries) GetService(ctx context.Context, arg GetServiceParams) (Service
 }
 
 const getServices = `-- name: GetServices :many
-SELECT id, project_id, service_name, url
-FROM services
-WHERE project_id = $1
+SELECT s.id, p.project_name, s.service_name, s.url
+from services s
+         INNER JOIN projects p on p.id = s.project_id
 `
 
-func (q *Queries) GetServices(ctx context.Context, projectID uuid.UUID) ([]Service, error) {
-	rows, err := q.db.QueryContext(ctx, getServices, projectID)
+type GetServicesRow struct {
+	ID          uuid.UUID `json:"id"`
+	ProjectName string    `json:"project_name"`
+	ServiceName string    `json:"service_name"`
+	Url         string    `json:"url"`
+}
+
+func (q *Queries) GetServices(ctx context.Context) ([]GetServicesRow, error) {
+	rows, err := q.db.QueryContext(ctx, getServices)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetServicesRow
+	for rows.Next() {
+		var i GetServicesRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectName,
+			&i.ServiceName,
+			&i.Url,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getServicesByProjectName = `-- name: GetServicesByProjectName :many
+SELECT id, project_id, service_name, url
+FROM services
+WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
+`
+
+func (q *Queries) GetServicesByProjectName(ctx context.Context, projectName string) ([]Service, error) {
+	rows, err := q.db.QueryContext(ctx, getServicesByProjectName, projectName)
 	if err != nil {
 		return nil, err
 	}
@@ -104,20 +152,39 @@ func (q *Queries) GetServices(ctx context.Context, projectID uuid.UUID) ([]Servi
 	return items, nil
 }
 
+const serviceExists = `-- name: ServiceExists :one
+SELECT EXISTS(SELECT 1
+              FROM services s
+              WHERE s.service_name = $2
+                AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1))
+`
+
+type ServiceExistsParams struct {
+	ProjectName string `json:"project_name"`
+	ServiceName string `json:"service_name"`
+}
+
+func (q *Queries) ServiceExists(ctx context.Context, arg ServiceExistsParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, serviceExists, arg.ProjectName, arg.ServiceName)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const updateService = `-- name: UpdateService :exec
 UPDATE services
 SET service_name = $2,
     url          = $3
-WHERE project_id = $1
+WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
 `
 
 type UpdateServiceParams struct {
-	ProjectID   uuid.UUID
-	ServiceName string
-	Url         string
+	ProjectName string `json:"project_name"`
+	ServiceName string `json:"service_name"`
+	Url         string `json:"url"`
 }
 
 func (q *Queries) UpdateService(ctx context.Context, arg UpdateServiceParams) error {
-	_, err := q.db.ExecContext(ctx, updateService, arg.ProjectID, arg.ServiceName, arg.Url)
+	_, err := q.db.ExecContext(ctx, updateService, arg.ProjectName, arg.ServiceName, arg.Url)
 	return err
 }
