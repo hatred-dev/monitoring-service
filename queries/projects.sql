@@ -24,9 +24,12 @@ WHERE project_name = $1;
 UPDATE projects
 SET project_name = $2,
     active       = $3
-WHERE id = $1;
+WHERE id = (SELECT id FROM projects p WHERE p.project_name = $1);
 
 -- name: ProjectSetState :exec
 UPDATE projects
 SET active = $2
 WHERE project_name = $1;
+
+-- name: ProjectExists :one
+SELECT EXISTS(SELECT 1 FROM projects p WHERE p.project_name = $1);
