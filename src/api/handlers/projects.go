@@ -46,7 +46,7 @@ func HandleCreateProject(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, models.CreateProjectResponse{
+	ctx.JSON(http.StatusCreated, models.CreateProjectResponse{
 		Id:          projectCreated.ID.String(),
 		ProjectName: project.ProjectName,
 		Active:      project.Active,

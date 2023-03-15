@@ -14,6 +14,10 @@ func HandleCreateIP(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
+	projectExists := helpers.CheckIfProjectExists(ctx, ip.ProjectName)
+	if !projectExists {
+		return
+	}
 	newIp, err := database.Conn.CreateIP(ctx, database.CreateIPParams{
 		ProjectName: ip.ProjectName,
 		Ip:          ip.Ip,
@@ -34,9 +38,9 @@ func HandleUpdateIP(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	exists, _ := database.Conn.IPExists(ctx, ip.Ip)
+	exists := helpers.CheckIfIPExists(ctx, ip.Ip)
 	if !exists {
-		helpers.SendError(ctx, "ip does not exist")
+		return
 	}
 	err := database.Conn.UpdateIP(ctx, database.UpdateIPParams{
 		Ip:   ip.Ip,
@@ -46,4 +50,39 @@ func HandleUpdateIP(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
+}
+
+func HandleDeleteIP(ctx *gin.Context) {
+	var ip *models.DeleteIPAddressRequest
+	if err := ctx.ShouldBind(&ip); err != nil {
+		helpers.Abort(ctx, err)
+		return
+	}
+	exists := helpers.CheckIfIPExists(ctx, ip.Ip)
+	if !exists {
+		return
+	}
+	err := database.Conn.DeleteIP(ctx, ip.Ip)
+	if err != nil {
+		helpers.Abort(ctx, err)
+		return
+	}
+}
+
+func HandleGetIPs(ctx *gin.Context) {
+	ips, _ := database.Conn.GetAllIPs(ctx)
+	ctx.JSON(http.StatusOK, ips)
+}
+
+func HandleGetIPsByProjectName(ctx *gin.Context) {
+	projectName := ctx.Param("project_name")
+	projectExists := helpers.CheckIfProjectExists(ctx, projectName)
+	if !projectExists {
+		return
+	}
+	ips, err := database.Conn.GetIPsByProjectName(ctx, projectName)
+	if err != nil {
+		helpers.Abort(ctx, err)
+	}
+	ctx.JSON(http.StatusOK, ips)
 }
