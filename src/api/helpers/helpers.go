@@ -36,3 +36,11 @@ func CheckIfServiceExists(ctx *gin.Context, projectName string, serviceName stri
 	}
 	return exists
 }
+
+func CheckIfIPExists(ctx *gin.Context, ip string) bool {
+	exists, _ := database.Conn.IPExists(ctx, ip)
+	if !exists {
+		SendError(ctx, "ip does not exist")
+	}
+	return exists
+}

@@ -14,3 +14,7 @@ type UpdateIPAddressRequest struct {
 	Ip    string `json:"ip" binding:"required"`
 	NewIp string `json:"new_ip" binding:"required"`
 }
+
+type DeleteIPAddressRequest struct {
+	Ip string `json:"ip" binding:"required"`
+}

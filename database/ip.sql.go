@@ -29,21 +29,39 @@ func (q *Queries) CreateIP(ctx context.Context, arg CreateIPParams) (IpAddress, 
 	return i, err
 }
 
-const getAllIPs = `-- name: GetAllIPs :many
-SELECT id, project_id, ip
+const deleteIP = `-- name: DeleteIP :exec
+DELETE
 FROM ip_address
+WHERE ip = $1
 `
 
-func (q *Queries) GetAllIPs(ctx context.Context) ([]IpAddress, error) {
+func (q *Queries) DeleteIP(ctx context.Context, ip string) error {
+	_, err := q.db.ExecContext(ctx, deleteIP, ip)
+	return err
+}
+
+const getAllIPs = `-- name: GetAllIPs :many
+SELECT i.id, p.project_name, i.ip
+FROM ip_address i
+         INNER JOIN projects p on p.id = i.project_id
+`
+
+type GetAllIPsRow struct {
+	ID          uuid.UUID `json:"id"`
+	ProjectName string    `json:"project_name"`
+	Ip          string    `json:"ip"`
+}
+
+func (q *Queries) GetAllIPs(ctx context.Context) ([]GetAllIPsRow, error) {
 	rows, err := q.db.QueryContext(ctx, getAllIPs)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []IpAddress
+	var items []GetAllIPsRow
 	for rows.Next() {
-		var i IpAddress
-		if err := rows.Scan(&i.ID, &i.ProjectID, &i.Ip); err != nil {
+		var i GetAllIPsRow
+		if err := rows.Scan(&i.ID, &i.ProjectName, &i.Ip); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -57,14 +75,14 @@ func (q *Queries) GetAllIPs(ctx context.Context) ([]IpAddress, error) {
 	return items, nil
 }
 
-const getIPs = `-- name: GetIPs :many
+const getIPsByProjectName = `-- name: GetIPsByProjectName :many
 SELECT id, project_id, ip
 FROM ip_address
-WHERE project_id = $1
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
 `
 
-func (q *Queries) GetIPs(ctx context.Context, projectID uuid.UUID) ([]IpAddress, error) {
-	rows, err := q.db.QueryContext(ctx, getIPs, projectID)
+func (q *Queries) GetIPsByProjectName(ctx context.Context, projectName string) ([]IpAddress, error) {
+	rows, err := q.db.QueryContext(ctx, getIPsByProjectName, projectName)
 	if err != nil {
 		return nil, err
 	}

@@ -28,6 +28,9 @@ func CreateRouter() *gin.Engine {
 		{
 			ips.POST("/", handlers.HandleCreateIP)
 			ips.PATCH("/", handlers.HandleUpdateIP)
+			ips.GET("/", handlers.HandleGetIPs)
+			ips.GET("/:project_name", handlers.HandleGetIPsByProjectName)
+			ips.DELETE("/", handlers.HandleDeleteIP)
 		}
 	}
 	return r
