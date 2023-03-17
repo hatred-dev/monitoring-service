@@ -5,6 +5,7 @@ import (
 )
 
 var DBConfig *DatabaseConfig
+var TGConfig *TelegramConfig
 
 type DatabaseConfig struct {
 	PostgresUser     string
@@ -35,7 +36,19 @@ func initDBConfig() {
 	}
 }
 
+type TelegramConfig struct {
+	BotToken string
+	ChatId   string
+}
+
+func initTelegramConfig() {
+	TGConfig = &TelegramConfig{
+		BotToken: getEnvOrDefault("", "bot_token", ""),
+		ChatId:   getEnvOrDefault("", "chat_id", ""),
+	}
+}
+
 func InitConfigurations() {
 	initDBConfig()
-
+	initTelegramConfig()
 }
