@@ -1,16 +1,11 @@
 package helpers
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"monitoring-service/database"
 	"net/http"
 )
-
-func SendError(ctx *gin.Context, err string) {
-	ctx.JSON(http.StatusBadRequest, gin.H{
-		"error": err,
-	})
-}
 
 func Abort(ctx *gin.Context, err error) {
 	ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -21,7 +16,7 @@ func Abort(ctx *gin.Context, err error) {
 func CheckIfProjectExists(ctx *gin.Context, name string) bool {
 	exists, _ := database.Conn.ProjectExists(ctx, name)
 	if !exists {
-		SendError(ctx, "project does not exist")
+		Abort(ctx, errors.New("project already exists"))
 	}
 	return exists
 }
@@ -32,7 +27,7 @@ func CheckIfServiceExists(ctx *gin.Context, projectName string, serviceName stri
 		ServiceName: serviceName,
 	})
 	if !exists {
-		SendError(ctx, "service does not exist")
+		Abort(ctx, errors.New("service already exists"))
 	}
 	return exists
 }
@@ -40,7 +35,7 @@ func CheckIfServiceExists(ctx *gin.Context, projectName string, serviceName stri
 func CheckIfIPExists(ctx *gin.Context, ip string) bool {
 	exists, _ := database.Conn.IPExists(ctx, ip)
 	if !exists {
-		SendError(ctx, "ip does not exist")
+		Abort(ctx, errors.New("ip already exists"))
 	}
 	return exists
 }

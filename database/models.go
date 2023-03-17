@@ -11,9 +11,10 @@ import (
 )
 
 type IpAddress struct {
-	ID        uuid.UUID `json:"id"`
-	ProjectID uuid.UUID `json:"project_id"`
-	Ip        string    `json:"ip"`
+	ID        uuid.UUID    `json:"id"`
+	ProjectID uuid.UUID    `json:"project_id"`
+	Ip        string       `json:"ip"`
+	Active    sql.NullBool `json:"active"`
 }
 
 type Project struct {
@@ -23,8 +24,9 @@ type Project struct {
 }
 
 type Service struct {
-	ID          uuid.UUID `json:"id"`
-	ProjectID   uuid.UUID `json:"project_id"`
-	ServiceName string    `json:"service_name"`
-	Url         string    `json:"url"`
+	ID          uuid.UUID    `json:"id"`
+	ProjectID   uuid.UUID    `json:"project_id"`
+	ServiceName string       `json:"service_name"`
+	Url         string       `json:"url"`
+	Active      sql.NullBool `json:"active"`
 }

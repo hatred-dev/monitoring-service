@@ -7,6 +7,7 @@ import (
 	"monitoring-service/database"
 	"monitoring-service/src/api/router"
 	"monitoring-service/src/configuration"
+	"monitoring-service/src/services"
 )
 
 func init() {
@@ -19,5 +20,6 @@ func StartApplication() {
 		log.Fatal(err)
 	}
 	database.Conn = database.New(db)
+	services.StartServices()
 	router.CreateRouter().Run(":8000")
 }
