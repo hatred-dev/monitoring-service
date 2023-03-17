@@ -87,8 +87,8 @@ func TestInsertIP(t *testing.T) {
 		t.Error(err)
 	}
 	ip, err := queries.CreateIP(ctx, database.CreateIPParams{
-		ProjectID: project.ID,
-		Ip:        "1.1.1.1",
+		ProjectName: project.ProjectName,
+		Ip:          "1.1.1.1",
 	})
 	if err != nil {
 		t.Error(err)
@@ -113,8 +113,8 @@ func TestCascadeDelete(t *testing.T) {
 		t.Error(err)
 	}
 	ip, err := queries.CreateIP(ctx, database.CreateIPParams{
-		ProjectID: project.ID,
-		Ip:        "1.1.1.1",
+		ProjectName: project.ProjectName,
+		Ip:          "1.1.1.1",
 	})
 	if err != nil {
 		t.Error(err)
