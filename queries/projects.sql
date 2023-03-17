@@ -1,8 +1,7 @@
--- name: GetProjectByName :one
+-- name: GetProjectByName :many
 SELECT *
-FROM projects
-WHERE project_name = $1
-LIMIT 1;
+FROM projects p
+WHERE project_name = $1;
 
 
 -- name: GetProjects :many

@@ -14,7 +14,7 @@ import (
 const createIP = `-- name: CreateIP :one
 INSERT INTO ip_address (project_id, ip)
 VALUES ((SELECT p.id FROM projects p WHERE p.project_name = $1), $2)
-RETURNING id, project_id, ip
+RETURNING id, project_id, ip, active
 `
 
 type CreateIPParams struct {
@@ -25,7 +25,12 @@ type CreateIPParams struct {
 func (q *Queries) CreateIP(ctx context.Context, arg CreateIPParams) (IpAddress, error) {
 	row := q.db.QueryRowContext(ctx, createIP, arg.ProjectName, arg.Ip)
 	var i IpAddress
-	err := row.Scan(&i.ID, &i.ProjectID, &i.Ip)
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.Ip,
+		&i.Active,
+	)
 	return i, err
 }
 
@@ -76,7 +81,7 @@ func (q *Queries) GetAllIPs(ctx context.Context) ([]GetAllIPsRow, error) {
 }
 
 const getIPsByProjectName = `-- name: GetIPsByProjectName :many
-SELECT id, project_id, ip
+SELECT id, project_id, ip, active
 FROM ip_address
 WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
 `
@@ -90,7 +95,12 @@ func (q *Queries) GetIPsByProjectName(ctx context.Context, projectName string) (
 	var items []IpAddress
 	for rows.Next() {
 		var i IpAddress
-		if err := rows.Scan(&i.ID, &i.ProjectID, &i.Ip); err != nil {
+		if err := rows.Scan(
+			&i.ID,
+			&i.ProjectID,
+			&i.Ip,
+			&i.Active,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

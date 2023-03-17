@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -14,7 +15,7 @@ import (
 const createService = `-- name: CreateService :one
 INSERT INTO services (project_id, service_name, url)
 VALUES ((SELECT id FROM projects WHERE project_name = $1), $2, $3)
-RETURNING id, project_id, service_name, url
+RETURNING id, project_id, service_name, url, active
 `
 
 type CreateServiceParams struct {
@@ -31,6 +32,7 @@ func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) (S
 		&i.ProjectID,
 		&i.ServiceName,
 		&i.Url,
+		&i.Active,
 	)
 	return i, err
 }
@@ -38,7 +40,7 @@ func (q *Queries) CreateService(ctx context.Context, arg CreateServiceParams) (S
 const deleteService = `-- name: DeleteService :exec
 DELETE
 FROM services
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
   AND service_name = $2
 `
 
@@ -53,7 +55,7 @@ func (q *Queries) DeleteService(ctx context.Context, arg DeleteServiceParams) er
 }
 
 const getService = `-- name: GetService :one
-SELECT id, project_id, service_name, url
+SELECT id, project_id, service_name, url, active
 FROM services
 WHERE project_id = $1
   AND service_name = $2
@@ -73,8 +75,28 @@ func (q *Queries) GetService(ctx context.Context, arg GetServiceParams) (Service
 		&i.ProjectID,
 		&i.ServiceName,
 		&i.Url,
+		&i.Active,
 	)
 	return i, err
+}
+
+const getServiceState = `-- name: GetServiceState :one
+SELECT active
+FROM services s
+WHERE s.service_name = $2
+  AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1)
+`
+
+type GetServiceStateParams struct {
+	ProjectName string `json:"project_name"`
+	ServiceName string `json:"service_name"`
+}
+
+func (q *Queries) GetServiceState(ctx context.Context, arg GetServiceStateParams) (sql.NullBool, error) {
+	row := q.db.QueryRowContext(ctx, getServiceState, arg.ProjectName, arg.ServiceName)
+	var active sql.NullBool
+	err := row.Scan(&active)
+	return active, err
 }
 
 const getServices = `-- name: GetServices :many
@@ -119,9 +141,9 @@ func (q *Queries) GetServices(ctx context.Context) ([]GetServicesRow, error) {
 }
 
 const getServicesByProjectName = `-- name: GetServicesByProjectName :many
-SELECT id, project_id, service_name, url
+SELECT id, project_id, service_name, url, active
 FROM services
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
 `
 
 func (q *Queries) GetServicesByProjectName(ctx context.Context, projectName string) ([]Service, error) {
@@ -138,6 +160,7 @@ func (q *Queries) GetServicesByProjectName(ctx context.Context, projectName stri
 			&i.ProjectID,
 			&i.ServiceName,
 			&i.Url,
+			&i.Active,
 		); err != nil {
 			return nil, err
 		}
@@ -156,7 +179,7 @@ const serviceExists = `-- name: ServiceExists :one
 SELECT EXISTS(SELECT 1
               FROM services s
               WHERE s.service_name = $2
-                AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1))
+                AND project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1))
 `
 
 type ServiceExistsParams struct {
@@ -171,11 +194,29 @@ func (q *Queries) ServiceExists(ctx context.Context, arg ServiceExistsParams) (b
 	return exists, err
 }
 
+const setServiceState = `-- name: SetServiceState :exec
+UPDATE services s
+SET active = $3
+WHERE s.service_name = $2
+  AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1)
+`
+
+type SetServiceStateParams struct {
+	ProjectName string       `json:"project_name"`
+	ServiceName string       `json:"service_name"`
+	Active      sql.NullBool `json:"active"`
+}
+
+func (q *Queries) SetServiceState(ctx context.Context, arg SetServiceStateParams) error {
+	_, err := q.db.ExecContext(ctx, setServiceState, arg.ProjectName, arg.ServiceName, arg.Active)
+	return err
+}
+
 const updateService = `-- name: UpdateService :exec
 UPDATE services
 SET service_name = $2,
     url          = $3
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
 `
 
 type UpdateServiceParams struct {

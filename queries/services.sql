@@ -6,7 +6,7 @@ from services s
 -- name: GetServicesByProjectName :many
 SELECT *
 FROM services
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1);
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1);
 
 -- name: CreateService :one
 INSERT INTO services (project_id, service_name, url)
@@ -17,12 +17,12 @@ RETURNING *;
 UPDATE services
 SET service_name = $2,
     url          = $3
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1);
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1);
 
 -- name: DeleteService :exec
 DELETE
 FROM services
-WHERE project_id = (SELECT project_id FROM projects WHERE project_name = $1)
+WHERE project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1)
   AND service_name = $2;
 
 -- name: GetService :one
@@ -36,4 +36,17 @@ LIMIT 1;
 SELECT EXISTS(SELECT 1
               FROM services s
               WHERE s.service_name = $2
-                AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1));
+                AND project_id = (SELECT p.id FROM projects p WHERE p.project_name = $1));
+
+-- name: GetServiceState :one
+SELECT active
+FROM services s
+WHERE s.service_name = $2
+  AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1);
+
+-- name: SetServiceState :exec
+UPDATE services s
+SET active = $3
+WHERE s.service_name = $2
+  AND project_id = (SELECT id FROM projects p WHERE p.project_name = $1);
+

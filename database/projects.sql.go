@@ -39,18 +39,33 @@ func (q *Queries) DeleteProject(ctx context.Context, projectName string) error {
 	return err
 }
 
-const getProjectByName = `-- name: GetProjectByName :one
+const getProjectByName = `-- name: GetProjectByName :many
 SELECT id, project_name, active
-FROM projects
+FROM projects p
 WHERE project_name = $1
-LIMIT 1
 `
 
-func (q *Queries) GetProjectByName(ctx context.Context, projectName string) (Project, error) {
-	row := q.db.QueryRowContext(ctx, getProjectByName, projectName)
-	var i Project
-	err := row.Scan(&i.ID, &i.ProjectName, &i.Active)
-	return i, err
+func (q *Queries) GetProjectByName(ctx context.Context, projectName string) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, getProjectByName, projectName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Project
+	for rows.Next() {
+		var i Project
+		if err := rows.Scan(&i.ID, &i.ProjectName, &i.Active); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getProjects = `-- name: GetProjects :many
