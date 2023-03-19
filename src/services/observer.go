@@ -11,6 +11,8 @@ import (
 	"net/http"
 )
 
+// TODO THIS SHIT NEEDS REFACTORING
+
 type Ip struct {
 	Ip     string
 	Active bool
@@ -54,8 +56,10 @@ func sendNotification(text string) {
 	fmt.Println(string(response))
 }
 
+// We have to store channels to gracefully shutdown function when reloading, this mitigates possibility of goroutine leakage
 var channels map[string]ChannelStorage
 
+// TODO needs rewriting
 func loadProjects() []ProjectFull {
 	ctx := context.Background()
 	projects, _ := database.Conn.GetProjects(ctx)
@@ -81,7 +85,7 @@ func loadProjects() []ProjectFull {
 	return projectsArr
 }
 
-func createFunctions(projects []ProjectFull) {
+func executeServices(projects []ProjectFull) {
 	for _, v := range projects {
 		storage := ChannelStorage{}
 		if len(v.Ips) != 0 {
@@ -105,10 +109,10 @@ func ReloadServices() {
 			close(v.HealthcheckChan)
 		}
 	}
-	createFunctions(loadProjects())
+	executeServices(loadProjects())
 }
 
 func StartServices() {
 	channels = make(map[string]ChannelStorage)
-	createFunctions(loadProjects())
+	executeServices(loadProjects())
 }
