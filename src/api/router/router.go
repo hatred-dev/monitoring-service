@@ -27,7 +27,7 @@ func CreateRouter() *gin.Engine {
 		}
 		if context.Request.Method != "GET" {
 			fmt.Println("Reloading...")
-			srv.ReloadServices()
+			go srv.ReloadServices()
 		}
 
 	})
