@@ -15,11 +15,12 @@ func healthcheck(done <-chan bool, projectName string, services []Service) {
 	client := http.Client{
 		Timeout: time.Second * 15,
 	}
-	// cycle allows to iterate through array over and over
+	// cycle allows to iterate through array infinitely
 	for {
 		select {
+		// when channel closes, this function terminates, allows to avoid goroutine leaks
 		case <-done:
-			fmt.Sprintln("Stopped checking", projectName)
+			fmt.Println("Stopped checking " + projectName)
 			return
 		default:
 			for _, v := range services {
