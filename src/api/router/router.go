@@ -20,14 +20,15 @@ func CreateRouter() *gin.Engine {
 	}
 	apiGroup := r.Group("/api")
 	apiGroup.Use(func(context *gin.Context) {
-		//executes only after request is successfully handled
+		// executes only after request is successfully handled
 		context.Next()
 		if context.IsAborted() {
 			return
 		}
+
 		if context.Request.Method != "GET" {
 			fmt.Println("Reloading...")
-			go srv.ReloadServices()
+			go srv.SupervisorObject.ReloadServices()
 		}
 
 	})
@@ -46,6 +47,7 @@ func CreateRouter() *gin.Engine {
 			services.GET("/", handlers.HandleGetServices)
 			services.GET("/:project_name", handlers.HandleGetServicesByProjectName)
 			services.DELETE("/", handlers.HandleDeleteService)
+			services.PATCH("/", handlers.HandlePatchService)
 		}
 		ips := apiGroup.Group("/ips")
 		{

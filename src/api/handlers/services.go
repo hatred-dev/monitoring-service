@@ -33,6 +33,10 @@ func HandleCreateService(ctx *gin.Context) {
 	})
 }
 
+func HandlePatchService(ctx *gin.Context) {
+
+}
+
 func HandleGetServices(ctx *gin.Context) {
 	services, err := database.Conn.GetServices(ctx)
 	if err != nil {
