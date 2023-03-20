@@ -9,7 +9,7 @@ import (
 )
 
 func HandleCreateIP(ctx *gin.Context) {
-	var ip *models.CreateIPAddressRequest
+	var ip *models.CreateIPAddressReq
 	if err := ctx.ShouldBind(&ip); err != nil {
 		helpers.Abort(ctx, err)
 		return
@@ -26,14 +26,14 @@ func HandleCreateIP(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusCreated, models.CreateIPAddressResponse{
+	ctx.JSON(http.StatusCreated, models.CreateIPAddressResp{
 		Id: newIp.ID.String(),
 		Ip: newIp.Ip,
 	})
 }
 
 func HandleUpdateIP(ctx *gin.Context) {
-	var ip *models.UpdateIPAddressRequest
+	var ip *models.UpdateIPAddressReq
 	if err := ctx.ShouldBind(&ip); err != nil {
 		helpers.Abort(ctx, err)
 		return
@@ -53,7 +53,7 @@ func HandleUpdateIP(ctx *gin.Context) {
 }
 
 func HandleDeleteIP(ctx *gin.Context) {
-	var ip *models.DeleteIPAddressRequest
+	var ip *models.DeleteIPAddressReq
 	if err := ctx.ShouldBind(&ip); err != nil {
 		helpers.Abort(ctx, err)
 		return

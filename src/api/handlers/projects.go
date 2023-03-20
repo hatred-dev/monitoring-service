@@ -29,7 +29,7 @@ func HandleGetProjectByName(ctx *gin.Context) {
 }
 
 func HandleCreateProject(ctx *gin.Context) {
-	var project *models.CreateProjectRequest
+	var project *models.CreateProjectReq
 	if err := ctx.ShouldBind(&project); err != nil {
 		helpers.Abort(ctx, err)
 		return
@@ -46,7 +46,7 @@ func HandleCreateProject(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusCreated, models.CreateProjectResponse{
+	ctx.JSON(http.StatusCreated, models.CreateProjectResp{
 		Id:          projectCreated.ID.String(),
 		ProjectName: project.ProjectName,
 		Active:      project.Active,
@@ -54,7 +54,7 @@ func HandleCreateProject(ctx *gin.Context) {
 }
 
 func HandlePatchProject(ctx *gin.Context) {
-	var newProject *models.PatchProjectRequest
+	var newProject *models.PatchProjectReq
 	if err := ctx.ShouldBind(&newProject); err != nil {
 		helpers.Abort(ctx, err)
 		return
@@ -77,7 +77,7 @@ func HandlePatchProject(ctx *gin.Context) {
 }
 
 func HandleDeleteProject(ctx *gin.Context) {
-	var project *models.DeleteProjectRequest
+	var project *models.DeleteProjectReq
 
 	if err := ctx.ShouldBind(&project); err != nil {
 		helpers.Abort(ctx, err)

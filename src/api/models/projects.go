@@ -1,40 +1,22 @@
 package models
 
-type GetProjectByName struct {
-	ProjectName string `json:"project_name" binding:"required"`
-}
-
-type CreateProjectRequest struct {
+type CreateProjectReq struct {
 	ProjectName string `json:"project_name" binding:"required"`
 	Active      bool   `json:"active"`
 }
 
-type CreateProjectResponse struct {
+type CreateProjectResp struct {
 	Id          string `json:"id"`
 	ProjectName string `json:"projectName"`
 	Active      bool   `json:"active"`
 }
 
-type PatchProjectRequest struct {
+type PatchProjectReq struct {
 	ProjectName    string `json:"project_name" binding:"required,project-exists"`
 	NewProjectName string `json:"new_project_name" binding:"required"`
 	Active         bool   `json:"active"`
 }
 
-type DeleteProjectRequest struct {
+type DeleteProjectReq struct {
 	ProjectName string `json:"project_name" binding:"required,project-exists"`
-}
-
-type FullProjectInfo struct {
-	ProjectName string
-	Active      bool
-	Ips         []struct {
-		Ip     string
-		Active bool
-	}
-	Services []struct {
-		ServiceName string
-		Url         string
-		Active      bool
-	}
 }

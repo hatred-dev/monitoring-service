@@ -9,7 +9,7 @@ import (
 )
 
 func HandleCreateService(ctx *gin.Context) {
-	var service *models.CreateServiceRequest
+	var service *models.CreateServiceReq
 	if err := ctx.ShouldBind(&service); err != nil {
 		helpers.Abort(ctx, err)
 		return
@@ -26,7 +26,7 @@ func HandleCreateService(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusCreated, models.CreateServiceResponse{
+	ctx.JSON(http.StatusCreated, models.CreateServiceResp{
 		Id:          createdService.ID.String(),
 		ServiceName: createdService.ServiceName,
 		Url:         createdService.Url,
@@ -68,7 +68,7 @@ func HandleGetServicesByProjectName(ctx *gin.Context) {
 }
 
 func HandleDeleteService(ctx *gin.Context) {
-	var service *models.DeleteServiceRequest
+	var service *models.DeleteServiceReq
 	if err := ctx.ShouldBind(&service); err != nil {
 		helpers.Abort(ctx, err)
 		return
