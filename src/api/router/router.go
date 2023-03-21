@@ -3,21 +3,12 @@ package router
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"monitoring-service/src/api/handlers"
-	"monitoring-service/src/api/validators"
 	srv "monitoring-service/src/services"
 )
 
 func CreateRouter() *gin.Engine {
 	r := gin.Default()
-	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		err := v.RegisterValidation("project-exists", validators.ProjectExists)
-		if err != nil {
-			return nil
-		}
-	}
 	apiGroup := r.Group("/api")
 	apiGroup.Use(func(context *gin.Context) {
 		// executes only after request is successfully handled

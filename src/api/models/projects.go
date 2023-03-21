@@ -12,11 +12,11 @@ type CreateProjectResp struct {
 }
 
 type PatchProjectReq struct {
-	ProjectName    string `json:"project_name" binding:"required,project-exists"`
+	ProjectName    string `json:"project_name" binding:"required"`
 	NewProjectName string `json:"new_project_name" binding:"required"`
 	Active         bool   `json:"active"`
 }
 
 type DeleteProjectReq struct {
-	ProjectName string `json:"project_name" binding:"required,project-exists"`
+	ProjectName string `json:"project_name" binding:"required"`
 }
