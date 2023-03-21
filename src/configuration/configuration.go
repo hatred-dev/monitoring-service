@@ -4,8 +4,11 @@ import (
 	"fmt"
 )
 
-var DBConfig *DatabaseConfig
-var TGConfig *TelegramConfig
+var (
+	DBConfig   *DatabaseConfig
+	TGConfig   *TelegramConfig
+	UptimeConf *Uptime
+)
 
 type DatabaseConfig struct {
 	PostgresUser     string
@@ -48,7 +51,16 @@ func initTelegramConfig() {
 	}
 }
 
+type Uptime struct {
+	UptimeUrl string
+}
+
+func initUptimeConfig() {
+	UptimeConf = &Uptime{UptimeUrl: getEnvOrDefault("", "uptime_url", "")}
+}
+
 func InitConfigurations() {
 	initDBConfig()
 	initTelegramConfig()
+	initUptimeConfig()
 }
