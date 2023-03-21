@@ -11,7 +11,7 @@ import (
 var SupervisorObject = &Supervisor{}
 
 type Supervisor struct {
-	channels map[string]sm.ChannelStorage
+	channels []sm.ChannelStorage
 	projects []sm.ProjectFull
 }
 
@@ -43,8 +43,8 @@ func (s *Supervisor) loadProjects() {
 }
 
 func (s *Supervisor) loadServices() {
-	s.channels = make(map[string]sm.ChannelStorage)
-	for _, v := range s.projects {
+	s.channels = make([]sm.ChannelStorage, len(s.projects))
+	for i, v := range s.projects {
 		storage := sm.ChannelStorage{}
 		if len(v.Ips) != 0 {
 			storage.PingChan = nil
@@ -54,7 +54,7 @@ func (s *Supervisor) loadServices() {
 			storage.HealthcheckChan = ch
 			go healthcheck(ch, v.ProjectName, v.Services)
 		}
-		s.channels[v.ProjectName] = storage
+		s.channels[i] = storage
 	}
 }
 
