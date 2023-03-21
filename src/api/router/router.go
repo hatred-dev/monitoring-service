@@ -6,11 +6,17 @@ import (
 	"monitoring-service/src/api/handlers"
 	"monitoring-service/src/configuration"
 	srv "monitoring-service/src/services"
+	"net/http"
 )
 
 func CreateRouter() *gin.Engine {
 	r := gin.Default()
 	apiGroup := r.Group(configuration.AppConf.RootPrefix + "/api")
+	apiGroup.GET("/", func(context *gin.Context) {
+		context.JSON(http.StatusOK, gin.H{
+			"status": "working",
+		})
+	})
 	apiGroup.Use(func(context *gin.Context) {
 		// executes only after request is successfully handled
 		context.Next()
