@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"monitoring-service/src/api/handlers"
+	"monitoring-service/src/configuration"
 	srv "monitoring-service/src/services"
 )
 
 func CreateRouter() *gin.Engine {
 	r := gin.Default()
-	apiGroup := r.Group("/api")
+	apiGroup := r.Group(configuration.AppConf.RootPrefix + "/api")
 	apiGroup.Use(func(context *gin.Context) {
 		// executes only after request is successfully handled
 		context.Next()

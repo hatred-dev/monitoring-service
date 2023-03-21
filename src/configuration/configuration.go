@@ -7,7 +7,8 @@ import (
 var (
 	DBConfig   *DatabaseConfig
 	TGConfig   *TelegramConfig
-	UptimeConf *Uptime
+	UptimeConf *UptimeConfiguration
+	AppConf    *AppConfiguration
 )
 
 type DatabaseConfig struct {
@@ -51,16 +52,27 @@ func initTelegramConfig() {
 	}
 }
 
-type Uptime struct {
+type UptimeConfiguration struct {
 	UptimeUrl string
 }
 
 func initUptimeConfig() {
-	UptimeConf = &Uptime{UptimeUrl: getEnvOrDefault("", "uptime_url", "")}
+	UptimeConf = &UptimeConfiguration{UptimeUrl: getEnvOrDefault("", "uptime_url", "")}
+}
+
+type AppConfiguration struct {
+	RootPrefix string
+}
+
+func initAppConfiguration() {
+	AppConf = &AppConfiguration{
+		RootPrefix: getEnvOrDefault("", "root_prefix", ""),
+	}
 }
 
 func InitConfigurations() {
 	initDBConfig()
 	initTelegramConfig()
 	initUptimeConfig()
+	initAppConfiguration()
 }
