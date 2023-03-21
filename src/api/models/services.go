@@ -24,7 +24,7 @@ type GetServicesResp struct {
 	Url         string `json:"url" binding:"required"`
 }
 
-type GetServicesByProjectNameResponse struct {
+type GetServicesByProjectNameResp struct {
 	Id          string `json:"id"`
 	ServiceName string `json:"service_name"`
 	Url         string `json:"url"`

@@ -56,9 +56,9 @@ func HandleGetServicesByProjectName(ctx *gin.Context) {
 		helpers.Abort(ctx, err)
 		return
 	}
-	servicesResponse := make([]*models.GetServicesByProjectNameResponse, len(services))
+	servicesResponse := make([]*models.GetServicesByProjectNameResp, len(services))
 	for i, v := range services {
-		servicesResponse[i] = &models.GetServicesByProjectNameResponse{
+		servicesResponse[i] = &models.GetServicesByProjectNameResp{
 			Id:          v.ID.String(),
 			ServiceName: v.ServiceName,
 			Url:         v.Url,
