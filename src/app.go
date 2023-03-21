@@ -21,6 +21,7 @@ func StartApplication() {
 		log.Fatal(err)
 	}
 	database.Conn = database.New(db)
+	services.RunMigrations(db)
 	services.StartServices()
 	err = router.CreateRouter().Run(":8000")
 	if err != nil {

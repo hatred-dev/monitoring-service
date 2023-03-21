@@ -9,5 +9,7 @@ RUN go build -o monitoring
 
 FROM alpine:latest
 WORKDIR /app
+COPY database database
+COPY migrations migrations
 COPY --from=build /app/monitoring monitoring
 ENTRYPOINT ["/app/monitoring"]
