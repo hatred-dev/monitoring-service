@@ -54,7 +54,7 @@ func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
 				}
 				if needsNotification {
 					notifications.SendTelegramNotification(message)
-					notifications.SendTimestamp()
+					notifications.SendUptimeNotification(projectName, v.Name, !active)
 					setServiceState(ctx, projectName, v.Name, !active)
 				}
 				fmt.Println(fmt.Sprintf("%s %s checked.", projectName, v.Name))
