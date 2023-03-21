@@ -2,6 +2,7 @@ package src
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 	"log"
 	"monitoring-service/database"
@@ -21,5 +22,8 @@ func StartApplication() {
 	}
 	database.Conn = database.New(db)
 	services.StartServices()
-	router.CreateRouter().Run(":8000")
+	err = router.CreateRouter().Run(":8000")
+	if err != nil {
+		fmt.Println(err)
+	}
 }

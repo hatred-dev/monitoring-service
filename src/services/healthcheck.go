@@ -58,7 +58,7 @@ func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
 					setServiceState(ctx, projectName, v.Name, !active)
 				}
 				fmt.Println(fmt.Sprintf("%s %s checked.", projectName, v.Name))
-				time.Sleep(time.Millisecond * 500)
+				time.Sleep(time.Millisecond * 400)
 			}
 		}
 	}
