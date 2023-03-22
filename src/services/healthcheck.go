@@ -30,8 +30,6 @@ func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
 				var needsNotification bool
 				active := getServiceState(projectName, v.Name)
 				resp, err := client.Get(v.Url)
-				fmt.Println(err.Error())
-
 				if active {
 					if resp == nil {
 						message = fmt.Sprintf("Did not receive any response from `%s`", projectName)
