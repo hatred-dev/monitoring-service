@@ -30,9 +30,13 @@ func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
 				var needsNotification bool
 				active := getServiceState(projectName, v.Name)
 				resp, err := client.Get(v.Url)
+				fmt.Println(err.Error())
 
 				if active {
-					if err, ok := err.(net.Error); ok && err.Timeout() {
+					if resp == nil {
+						message = fmt.Sprintf("Did not receive any response from `%s`", projectName)
+						needsNotification = true
+					} else if err, ok := err.(net.Error); ok && err.Timeout() {
 						message = fmt.Sprintf("WARNING\n`%s %s`\nTIMED OUT", projectName, v.Name)
 						needsNotification = true
 					} else {

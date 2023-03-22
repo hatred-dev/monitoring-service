@@ -7,7 +7,7 @@ type CreateProjectReq struct {
 
 type CreateProjectResp struct {
 	Id          string `json:"id"`
-	ProjectName string `json:"projectName"`
+	ProjectName string `json:"project_name"`
 	Active      bool   `json:"active"`
 }
 
