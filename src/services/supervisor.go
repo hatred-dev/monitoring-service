@@ -52,7 +52,7 @@ func (s *Supervisor) loadServices() {
 		if len(v.Services) != 0 {
 			ch := make(chan bool, 1)
 			storage.HealthcheckChan = ch
-			go healthcheck(ch, v.ProjectName, v.Services)
+			go healthcheckLoop(ch, v.ProjectName, v.Services)
 		}
 		s.channels[i] = storage
 	}

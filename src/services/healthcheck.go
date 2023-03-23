@@ -3,16 +3,18 @@ package services
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"monitoring-service/database"
 	sm "monitoring-service/src/services/models"
 	"monitoring-service/src/services/notifications"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 )
 
-func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
+func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service) {
 	ctx := context.Background()
 	client := &http.Client{
 		Timeout: time.Second * 15,
@@ -26,51 +28,59 @@ func healthcheck(done <-chan bool, projectName string, services []sm.Service) {
 			return
 		default:
 			for _, v := range services {
-				var message string
-				var needsNotification bool
-				active := getServiceState(projectName, v.Name)
-				resp, err := client.Get(v.Url)
-				if active {
-					if resp == nil {
-						message = fmt.Sprintf("Did not receive any response from `%s`", projectName)
-						needsNotification = true
-					} else if err, ok := err.(net.Error); ok && err.Timeout() {
-						message = fmt.Sprintf("WARNING\n`%s %s`\nTIMED OUT", projectName, v.Name)
-						needsNotification = true
-					} else {
-						switch resp.StatusCode {
-						case 500:
-							message = fmt.Sprintf("WARNING\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, v.Name)
-						case 400:
-							message = fmt.Sprintf("WARNING\n`%s %s`\nIS INACCESSIBLE", projectName, v.Name)
-						}
-						if resp.StatusCode != 200 {
-							needsNotification = true
-						}
-					}
-
-				} else {
-					if resp != nil && resp.StatusCode == 200 {
-						message = fmt.Sprintf("GOOD NEWS\n`%s %s`\nIS UP", projectName, v.Name)
-						needsNotification = true
-					}
-				}
-
-				if needsNotification {
-					notifications.SendTelegramNotification(message)
-					notifications.SendUptimeNotification(projectName, v.Name, !active)
-					setServiceState(ctx, projectName, v.Name, !active)
-				}
-				fmt.Println(message)
-				fmt.Println(fmt.Sprintf("%s %s checked.", projectName, v.Name))
+				healthcheck(projectName, &v, client, ctx)
 				time.Sleep(time.Millisecond * 400)
 			}
 		}
 	}
 }
 
+func healthcheck(projectName string, service *sm.Service, client *http.Client, ctx context.Context) {
+	var dnsError *net.DNSError
+	var message string
+	active := getServiceState(projectName, service.Name)
+	resp, err := client.Get(service.Url)
+	defer func() {
+		if message != "" {
+			sendNotifications(projectName, service.Name, message, !active)
+			setServiceState(ctx, projectName, service.Name, !active)
+		}
+		fmt.Println(fmt.Sprintf("%s %s checked.", projectName, service.Name))
+	}()
+
+	if errors.As(err, &dnsError) && active {
+		message = fmt.Sprintf("`%s` hostname resolution failed", projectName)
+		return
+	}
+	if err, ok := err.(*url.Error); ok && active && err.Timeout() {
+		message = fmt.Sprintf("WARNING\n`%s %s`\nTIMED OUT", projectName, service.Name)
+		return
+	}
+	if resp == nil {
+		return
+	}
+	if resp.StatusCode == 500 && active {
+		message = fmt.Sprintf("WARNING\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.Name)
+		return
+	}
+	if resp.StatusCode == 404 && active {
+		message = fmt.Sprintf("WARNING\n`%s %s`\nIS INACCESSIBLE", projectName, service.Name)
+		return
+	}
+	if resp.StatusCode == 200 && !active {
+		message = fmt.Sprintf("GOOD NEWS\n`%s %s`\nIS UP", projectName, service.Name)
+		return
+	}
+
+}
+
+func sendNotifications(projectName, serviceName, message string, active bool) {
+	notifications.SendTelegramNotification(message)
+	notifications.SendUptimeNotification(projectName, serviceName, !active)
+}
+
 func setServiceState(ctx context.Context, projectName, serviceName string, active bool) {
-	err := database.Conn.SetServiceState(ctx, database.SetServiceStateParams{
+	database.Conn.SetServiceState(ctx, database.SetServiceStateParams{
 		ProjectName: projectName,
 		ServiceName: serviceName,
 		Active: sql.NullBool{
@@ -78,7 +88,6 @@ func setServiceState(ctx context.Context, projectName, serviceName string, activ
 			Valid: true,
 		},
 	})
-	fmt.Println(err)
 }
 
 func getServiceState(projectName, serviceName string) bool {
