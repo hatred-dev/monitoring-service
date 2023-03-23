@@ -46,9 +46,11 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 			sendNotifications(projectName, service.Name, message, !active)
 			setServiceState(ctx, projectName, service.Name, !active)
 		}
-		err := resp.Body.Close()
-		if err != nil {
-			fmt.Println(err)
+		if resp != nil {
+			err := resp.Body.Close()
+			if err != nil {
+				fmt.Println(err)
+			}
 		}
 		fmt.Println(fmt.Sprintf("%s %s checked.", projectName, service.Name))
 	}()
