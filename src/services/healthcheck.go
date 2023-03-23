@@ -40,10 +40,15 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 	var message string
 	active := getServiceState(projectName, service.Name)
 	resp, err := client.Get(service.Url)
+
 	defer func() {
 		if message != "" {
 			sendNotifications(projectName, service.Name, message, !active)
 			setServiceState(ctx, projectName, service.Name, !active)
+		}
+		err := resp.Body.Close()
+		if err != nil {
+			fmt.Println(err)
 		}
 		fmt.Println(fmt.Sprintf("%s %s checked.", projectName, service.Name))
 	}()
@@ -80,7 +85,7 @@ func sendNotifications(projectName, serviceName, message string, active bool) {
 }
 
 func setServiceState(ctx context.Context, projectName, serviceName string, active bool) {
-	database.Conn.SetServiceState(ctx, database.SetServiceStateParams{
+	err := database.Conn.SetServiceState(ctx, database.SetServiceStateParams{
 		ProjectName: projectName,
 		ServiceName: serviceName,
 		Active: sql.NullBool{
@@ -88,6 +93,9 @@ func setServiceState(ctx context.Context, projectName, serviceName string, activ
 			Valid: true,
 		},
 	})
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func getServiceState(projectName, serviceName string) bool {
