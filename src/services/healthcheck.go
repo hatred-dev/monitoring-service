@@ -67,15 +67,15 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 		return
 	}
 	if resp.StatusCode == 500 && active {
-		message = fmt.Sprintf("WARNING\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.Name)
+		message = fmt.Sprintf("🚫️WARNING🚫️\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.Name)
 		return
 	}
 	if resp.StatusCode == 404 && active {
-		message = fmt.Sprintf("WARNING\n`%s %s`\nIS INACCESSIBLE", projectName, service.Name)
+		message = fmt.Sprintf("⚠️WARNING⚠️\n`%s %s`\nIS INACCESSIBLE", projectName, service.Name)
 		return
 	}
 	if resp.StatusCode == 200 && !active {
-		message = fmt.Sprintf("GOOD NEWS\n`%s %s`\nIS UP", projectName, service.Name)
+		message = fmt.Sprintf("🌀GOOD NEWS🌀\n`%s %s`\nIS UP", projectName, service.Name)
 		return
 	}
 

@@ -45,11 +45,11 @@ func ping(ctx context.Context, projectName string, ip *sm.Ip) {
 		fmt.Println(err)
 	}
 	if strings.Contains(string(pingRes), "0 packets received") && active.Bool {
-		message = fmt.Sprintf("ALERT\n`%s` server is down `%s`", projectName, ip.Ip)
+		message = fmt.Sprintf("🚨ALERT🚨\n`%s` server is down `%s`", projectName, ip.Ip)
 		return
 	}
 	if !strings.Contains(string(pingRes), "0 packets received") && !active.Bool {
-		message = fmt.Sprintf("RELIEF\n`%s` server is up `%s`", projectName, ip.Ip)
+		message = fmt.Sprintf("🌿RELIEF🌿\n`%s` server is up `%s`", projectName, ip.Ip)
 		return
 	}
 }
