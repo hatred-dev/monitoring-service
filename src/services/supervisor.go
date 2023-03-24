@@ -47,7 +47,9 @@ func (s *Supervisor) loadServices() {
 	for i, v := range s.projects {
 		storage := sm.ChannelStorage{}
 		if len(v.Ips) != 0 {
-			storage.PingChan = nil
+			ch := make(chan bool, 1)
+			storage.PingChan = ch
+			go pingLoop(ch, v.ProjectName, v.Ips)
 		}
 		if len(v.Services) != 0 {
 			ch := make(chan bool, 1)

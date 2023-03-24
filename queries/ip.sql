@@ -26,3 +26,13 @@ WHERE id = (SELECT i.id FROM ip_address i WHERE i.ip = $1);
 DELETE
 FROM ip_address
 WHERE ip = $1;
+
+-- name: GetIpState :one
+SELECT active
+FROM ip_address
+WHERE ip = $1;
+
+-- name: SetIpState :exec
+UPDATE ip_address
+SET active = $1
+WHERE ip = $2;

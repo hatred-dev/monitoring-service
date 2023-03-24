@@ -29,8 +29,8 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 		default:
 			for _, v := range services {
 				healthcheck(projectName, &v, client, ctx)
-				time.Sleep(time.Millisecond * 400)
 			}
+			time.Sleep(time.Second * 1)
 		}
 	}
 }
@@ -38,7 +38,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 func healthcheck(projectName string, service *sm.Service, client *http.Client, ctx context.Context) {
 	var dnsError *net.DNSError
 	var message string
-	active := getServiceState(projectName, service.Name)
+	active := getServiceState(ctx, projectName, service.Name)
 	resp, err := client.Get(service.Url)
 
 	defer func() {
@@ -100,8 +100,8 @@ func setServiceState(ctx context.Context, projectName, serviceName string, activ
 	}
 }
 
-func getServiceState(projectName, serviceName string) bool {
-	active, _ := database.Conn.GetServiceState(context.Background(), database.GetServiceStateParams{
+func getServiceState(ctx context.Context, projectName, serviceName string) bool {
+	active, _ := database.Conn.GetServiceState(ctx, database.GetServiceStateParams{
 		ProjectName: projectName,
 		ServiceName: serviceName,
 	})

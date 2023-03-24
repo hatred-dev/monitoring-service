@@ -7,6 +7,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 
 	"github.com/google/uuid"
 )
@@ -114,6 +115,19 @@ func (q *Queries) GetIPsByProjectName(ctx context.Context, projectName string) (
 	return items, nil
 }
 
+const getIpState = `-- name: GetIpState :one
+SELECT active
+FROM ip_address
+WHERE ip = $1
+`
+
+func (q *Queries) GetIpState(ctx context.Context, ip string) (sql.NullBool, error) {
+	row := q.db.QueryRowContext(ctx, getIpState, ip)
+	var active sql.NullBool
+	err := row.Scan(&active)
+	return active, err
+}
+
 const iPExists = `-- name: IPExists :one
 SELECT EXISTS(SELECT 1 from ip_address where ip = $1)
 `
@@ -123,6 +137,22 @@ func (q *Queries) IPExists(ctx context.Context, ip string) (bool, error) {
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const setIpState = `-- name: SetIpState :exec
+UPDATE ip_address
+SET active = $1
+WHERE ip = $2
+`
+
+type SetIpStateParams struct {
+	Active sql.NullBool `json:"active"`
+	Ip     string       `json:"ip"`
+}
+
+func (q *Queries) SetIpState(ctx context.Context, arg SetIpStateParams) error {
+	_, err := q.db.ExecContext(ctx, setIpState, arg.Active, arg.Ip)
+	return err
 }
 
 const updateIP = `-- name: UpdateIP :exec
