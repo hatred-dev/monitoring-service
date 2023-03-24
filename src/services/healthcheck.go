@@ -60,7 +60,7 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 		return
 	}
 	if err, ok := err.(*url.Error); ok && active && err.Timeout() {
-		message = fmt.Sprintf("WARNING\n`%s %s`\nTIMED OUT", projectName, service.Name)
+		message = fmt.Sprintf("🚫️WARNING🚫️\n`%s %s`\nTIMED OUT", projectName, service.Name)
 		return
 	}
 	if resp == nil {
