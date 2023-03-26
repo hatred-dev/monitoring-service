@@ -30,7 +30,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 			for _, v := range services {
 				healthcheck(projectName, &v, client, ctx)
 			}
-			time.Sleep(time.Second * 1)
+			time.Sleep(time.Second * 5)
 		}
 	}
 }
