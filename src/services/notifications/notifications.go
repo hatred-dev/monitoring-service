@@ -33,7 +33,10 @@ func SendTelegramNotification(text string) {
 			break
 		}
 	}
-	response, err := io.ReadAll(resp.Body)
+	var response []byte
+	if resp != nil {
+		response, err = io.ReadAll(resp.Body)
+	}
 	if err != nil {
 		fmt.Println(err)
 	} else {
