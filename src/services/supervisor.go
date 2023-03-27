@@ -62,14 +62,14 @@ func (s *Supervisor) loadServices() {
 
 func (s *Supervisor) ReloadServices() {
 	// shutdown every related goroutine
-	for _, v := range s.channels {
-		if v.PingChan != nil {
-			close(v.PingChan)
-		}
-		if v.HealthcheckChan != nil {
-			close(v.HealthcheckChan)
-		}
-	}
+	//for _, v := range s.channels {
+	//	if v.PingChan != nil {
+	//		close(v.PingChan)
+	//	}
+	//	if v.HealthcheckChan != nil {
+	//		close(v.HealthcheckChan)
+	//	}
+	//}
 	// load projects again
 	s.startServices()
 }
