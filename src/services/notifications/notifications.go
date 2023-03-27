@@ -12,15 +12,26 @@ import (
 )
 
 func SendTelegramNotification(text string) {
+	var resp *http.Response
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", configuration.TGConfig.BotToken)
 	body, err := json.Marshal(sm.TelegramMessage{
 		ParseMode: "MarkdownV2",
 		Text:      text,
 		ChatId:    configuration.TGConfig.ChatId,
 	})
-	resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
 	if err != nil {
 		fmt.Println(err)
+	}
+	for {
+		resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+		if err != nil {
+			fmt.Println(err)
+		}
+		if resp.StatusCode == http.StatusTooManyRequests {
+			time.Sleep(time.Second * 5)
+		} else {
+			break
+		}
 	}
 	response, _ := io.ReadAll(resp.Body)
 	fmt.Println(string(response))
