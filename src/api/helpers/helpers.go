@@ -27,7 +27,7 @@ func CheckIfServiceExists(ctx *gin.Context, projectName string, serviceName stri
 		ServiceName: serviceName,
 	})
 	if !exists {
-		Abort(ctx, errors.New("service already exists"))
+		Abort(ctx, errors.New("service does not exist"))
 	}
 	return exists
 }
@@ -35,7 +35,7 @@ func CheckIfServiceExists(ctx *gin.Context, projectName string, serviceName stri
 func CheckIfIPExists(ctx *gin.Context, ip string) bool {
 	exists, _ := database.Conn.IPExists(ctx, ip)
 	if !exists {
-		Abort(ctx, errors.New("ip already exists"))
+		Abort(ctx, errors.New("ip does not exist"))
 	}
 	return exists
 }
