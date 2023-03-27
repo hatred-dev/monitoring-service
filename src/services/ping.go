@@ -39,6 +39,7 @@ func ping(ctx context.Context, projectName string, ip *sm.Ip) {
 			sendNotifications(projectName, "server", message, !active.Bool)
 			setIpState(ctx, ip, !active.Bool)
 		}
+		fmt.Println(fmt.Sprintf("%s %s checked", projectName, ip.Ip))
 	}()
 
 	if err != nil {
