@@ -64,10 +64,10 @@ func (s *Supervisor) ReloadServices() {
 	// shutdown every related goroutine
 	for _, v := range s.channels {
 		if v.PingChan != nil {
-			close(v.PingChan)
+			v.PingChan <- true
 		}
 		if v.HealthcheckChan != nil {
-			close(v.HealthcheckChan)
+			v.HealthcheckChan <- true
 		}
 	}
 	// load projects again
