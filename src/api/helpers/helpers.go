@@ -15,7 +15,7 @@ func Abort(ctx *gin.Context, err error) {
 
 func CheckIfProjectExists(ctx *gin.Context, name string) bool {
 	exists, _ := database.Conn.ProjectExists(ctx, name)
-	if !exists {
+	if exists {
 		Abort(ctx, errors.New("project already exists"))
 	}
 	return exists
