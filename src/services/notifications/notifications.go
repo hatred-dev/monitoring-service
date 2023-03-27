@@ -33,8 +33,12 @@ func SendTelegramNotification(text string) {
 			break
 		}
 	}
-	response, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(response))
+	response, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(string(response))
+	}
 }
 
 func SendUptimeNotification(projectKey, service string, state bool) {
