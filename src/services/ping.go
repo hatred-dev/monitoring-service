@@ -29,7 +29,7 @@ func pingLoop(done <-chan bool, projectName string, ips []sm.Ip) {
 }
 
 func ping(ctx context.Context, projectName string, ip *sm.Ip) {
-	pingCmd := exec.Command("ping", "-c1", "-W", "15", ip.Ip)
+	pingCmd := exec.Command("ping", "-c2", "-W", "15", ip.Ip)
 	pingRes, err := pingCmd.Output()
 	active, _ := database.Conn.GetIpState(ctx, ip.Ip)
 	var message string
