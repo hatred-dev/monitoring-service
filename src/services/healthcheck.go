@@ -16,8 +16,11 @@ import (
 
 func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service) {
 	ctx := context.Background()
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DisableKeepAlives = true
 	client := http.Client{
-		Timeout: time.Second * 15,
+		Transport: transport,
+		Timeout:   time.Second * 15,
 	}
 	// cycle allows to iterate through array infinitely
 	for {
@@ -28,14 +31,14 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 			return
 		default:
 			for _, v := range services {
-				healthcheck(projectName, &v, client, ctx)
+				healthcheck(projectName, &v, &client, ctx)
 			}
 			time.Sleep(time.Second * 5)
 		}
 	}
 }
 
-func healthcheck(projectName string, service *sm.Service, client http.Client, ctx context.Context) {
+func healthcheck(projectName string, service *sm.Service, client *http.Client, ctx context.Context) {
 	var dnsError *net.DNSError
 	var message string
 	active := getServiceState(ctx, projectName, service.Name)
