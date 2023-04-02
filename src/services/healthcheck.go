@@ -18,7 +18,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 	ctx := context.Background()
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.DisableKeepAlives = true
-	client := http.Client{
+	client := &http.Client{
 		Transport: transport,
 		Timeout:   time.Second * 15,
 	}
@@ -31,7 +31,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 			return
 		default:
 			for _, v := range services {
-				healthcheck(projectName, &v, &client, ctx)
+				healthcheck(projectName, &v, client, ctx)
 			}
 			time.Sleep(time.Second * 5)
 		}
