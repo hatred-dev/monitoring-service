@@ -16,7 +16,7 @@ import (
 
 func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service) {
 	ctx := context.Background()
-	client := &http.Client{
+	client := http.Client{
 		Timeout: time.Second * 15,
 	}
 	// cycle allows to iterate through array infinitely
@@ -35,7 +35,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 	}
 }
 
-func healthcheck(projectName string, service *sm.Service, client *http.Client, ctx context.Context) {
+func healthcheck(projectName string, service *sm.Service, client http.Client, ctx context.Context) {
 	var dnsError *net.DNSError
 	var message string
 	active := getServiceState(ctx, projectName, service.Name)
