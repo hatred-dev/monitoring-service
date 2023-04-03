@@ -2,12 +2,12 @@ package services
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 	"monitoring-service/src/configuration"
+	"monitoring-service/src/logger"
 )
 
 func RunMigrations(db *sql.DB) {
@@ -21,6 +21,6 @@ func RunMigrations(db *sql.DB) {
 	}
 	err = m.Up()
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 	}
 }

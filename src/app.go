@@ -8,11 +8,13 @@ import (
 	"monitoring-service/database"
 	"monitoring-service/src/api/router"
 	"monitoring-service/src/configuration"
+	"monitoring-service/src/logger"
 	"monitoring-service/src/services"
 )
 
 func init() {
 	configuration.InitConfigurations()
+	logger.InitLogger()
 }
 
 func StartApplication() {

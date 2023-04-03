@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"monitoring-service/database"
+	"monitoring-service/src/logger"
 	sm "monitoring-service/src/services/models"
 	"os/exec"
 	"strings"
@@ -39,11 +40,11 @@ func ping(ctx context.Context, projectName string, ip *sm.Ip) {
 			sendNotifications(projectName, "server", message, !active.Bool)
 			setIpState(ctx, ip, !active.Bool)
 		}
-		fmt.Println(fmt.Sprintf("%s %s checked", projectName, ip.Ip))
+		logger.Log.Infof("%s %s checked", projectName, ip.Ip)
 	}()
 
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 	}
 	if strings.Contains(string(pingRes), "0 packets received") && active.Bool {
 		message = fmt.Sprintf("🚨ALERT🚨\n`%s` server is down `%s`", projectName, ip.Ip)
@@ -64,6 +65,6 @@ func setIpState(ctx context.Context, ip *sm.Ip, active bool) {
 		Ip: ip.Ip,
 	})
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 	}
 }

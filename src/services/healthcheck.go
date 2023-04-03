@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"monitoring-service/database"
+	"monitoring-service/src/logger"
 	sm "monitoring-service/src/services/models"
 	"monitoring-service/src/services/notifications"
 	"net"
@@ -55,7 +56,7 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 				fmt.Println(err)
 			}
 		}
-		fmt.Println(fmt.Sprintf("%s %s checked.", projectName, service.Name))
+		logger.Log.Infof("%s %s checked.", projectName, service.Name)
 	}()
 
 	if errors.As(err, &dnsError) && active {
@@ -81,7 +82,6 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 		message = fmt.Sprintf("🌀GOOD NEWS🌀\n`%s %s`\nIS UP", projectName, service.Name)
 		return
 	}
-
 }
 
 func sendNotifications(projectName, serviceName, message string, active bool) {
@@ -99,7 +99,7 @@ func setServiceState(ctx context.Context, projectName, serviceName string, activ
 		},
 	})
 	if err != nil {
-		fmt.Println(err)
+		logger.Log.Error(err)
 	}
 }
 
