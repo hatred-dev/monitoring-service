@@ -34,7 +34,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 			for _, v := range services {
 				healthcheck(projectName, &v, client, ctx)
 			}
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 3)
 		}
 	}
 }
@@ -47,7 +47,7 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 
 	defer func() {
 		if message != "" {
-			sendNotifications(projectName, service.Name, message, !active)
+			notifications.SendNotifications(projectName, service.Name, message, !active)
 			setServiceState(ctx, projectName, service.Name, !active)
 		}
 		if resp != nil {
@@ -82,11 +82,6 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 		message = fmt.Sprintf("🌀GOOD NEWS🌀\n`%s %s`\nIS UP", projectName, service.Name)
 		return
 	}
-}
-
-func sendNotifications(projectName, serviceName, message string, active bool) {
-	notifications.SendTelegramNotification(message)
-	notifications.SendUptimeNotification(projectName, serviceName, !active)
 }
 
 func setServiceState(ctx context.Context, projectName, serviceName string, active bool) {

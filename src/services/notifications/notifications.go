@@ -75,3 +75,8 @@ func SendUptimeNotification(projectKey, service string, state bool) {
 	response, _ := io.ReadAll(resp.Body)
 	logger.Log.Info(string(response))
 }
+
+func SendNotifications(projectName, serviceName, message string, active bool) {
+	SendTelegramNotification(message)
+	SendUptimeNotification(projectName, serviceName, !active)
+}

@@ -7,6 +7,7 @@ import (
 	"monitoring-service/database"
 	"monitoring-service/src/logger"
 	sm "monitoring-service/src/services/models"
+	"monitoring-service/src/services/notifications"
 	"os/exec"
 	"strings"
 	"time"
@@ -37,7 +38,7 @@ func ping(ctx context.Context, projectName string, ip *sm.Ip) {
 
 	defer func() {
 		if message != "" {
-			sendNotifications(projectName, "server", message, !active.Bool)
+			notifications.SendNotifications(projectName, "server", message, !active.Bool)
 			setIpState(ctx, ip, !active.Bool)
 		}
 		logger.Log.Infof("%s %s checked", projectName, ip.Ip)

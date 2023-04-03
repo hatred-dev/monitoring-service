@@ -15,6 +15,7 @@ import (
 func init() {
 	configuration.InitConfigurations()
 	logger.InitLogger()
+	go services.TimerService.StartTimer()
 }
 
 func StartApplication() {
