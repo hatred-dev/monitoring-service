@@ -47,7 +47,7 @@ func ping(ctx context.Context, projectName string, ip *sm.Ip) {
 	if err != nil {
 		logger.Log.Error(err)
 	}
-	if strings.Contains(string(pingRes), "0 packets received") && active.Bool {
+	if strings.Contains(string(pingRes), "0 received") && active.Bool {
 		message = fmt.Sprintf("🚨ALERT🚨\n`%s` server is down `%s`", projectName, ip.Ip)
 		return
 	}
