@@ -20,7 +20,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 	transport.DisableKeepAlives = true
 	client := &http.Client{
 		Transport: transport,
-		Timeout:   time.Second * 15,
+		Timeout:   time.Second * 30,
 	}
 	// cycle allows to iterate through array infinitely
 	for {
