@@ -41,7 +41,7 @@ func SendTelegramNotification(text string) {
 	if err != nil {
 		logger.Log.Error(err)
 	} else {
-		logger.Log.Info(string(response))
+		logger.Log.Info(response)
 	}
 }
 
@@ -73,7 +73,7 @@ func SendUptimeNotification(projectKey, service string, state bool) {
 		logger.Log.Warnln("Failed to sent uptime notification, cause:", err.Error())
 	}
 	response, _ := io.ReadAll(resp.Body)
-	logger.Log.Info(string(response))
+	logger.Log.Info(response)
 }
 
 func SendNotifications(projectName, serviceName, message string, active bool) {
