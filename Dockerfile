@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine as build
+FROM golang:alpine as build
 WORKDIR /app
 COPY database database
 COPY go.mod ./
