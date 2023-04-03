@@ -23,6 +23,7 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 		Transport: transport,
 		Timeout:   time.Second * 30,
 	}
+	ticker := time.NewTicker(time.Second * 3)
 	// cycle allows to iterate through array infinitely
 	for {
 		select {
@@ -30,11 +31,10 @@ func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service
 		case <-done:
 			fmt.Println("Stopped checking " + projectName)
 			return
-		default:
+		case <-ticker.C:
 			for _, v := range services {
 				healthcheck(projectName, &v, client, ctx)
 			}
-			time.Sleep(time.Second * 3)
 		}
 	}
 }

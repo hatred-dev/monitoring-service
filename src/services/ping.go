@@ -15,17 +15,17 @@ import (
 
 func pingLoop(done <-chan bool, projectName string, ips []sm.Ip) {
 	ctx := context.Background()
+	ticker := time.NewTicker(time.Second * 3)
 	for {
 		select {
 		// when channel closes, this function terminates, allows to avoid goroutine leaks
 		case <-done:
 			fmt.Println("Stopped checking ips " + projectName)
 			return
-		default:
+		case <-ticker.C:
 			for _, v := range ips {
 				ping(ctx, projectName, &v)
 			}
-			time.Sleep(time.Second * 1)
 		}
 	}
 }
