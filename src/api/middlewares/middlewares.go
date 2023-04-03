@@ -1,9 +1,8 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	srv "monitoring-service/src/services"
+	"monitoring-service/src/services"
 )
 
 func ReloadProjects(context *gin.Context) {
@@ -12,9 +11,7 @@ func ReloadProjects(context *gin.Context) {
 	if context.IsAborted() {
 		return
 	}
-
 	if context.Request.Method != "GET" {
-		fmt.Println("Reloading...")
-		srv.SupervisorObject.ReloadServices()
+		services.TimerService.ResetTimer()
 	}
 }
