@@ -41,7 +41,7 @@ func SendTelegramNotification(text string) {
 	if err != nil {
 		logger.Log.Error(err)
 	} else {
-		logger.Log.Info(response)
+		logger.Log.Infow("response", string(response))
 	}
 }
 
