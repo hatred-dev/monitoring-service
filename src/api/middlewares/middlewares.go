@@ -15,6 +15,6 @@ func ReloadProjects(context *gin.Context) {
 
 	if context.Request.Method != "GET" {
 		fmt.Println("Reloading...")
-		go srv.SupervisorObject.ReloadServices()
+		srv.SupervisorObject.ReloadServices()
 	}
 }
