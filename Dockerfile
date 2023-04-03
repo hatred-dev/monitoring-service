@@ -1,4 +1,4 @@
-FROM golang:alpine as build
+FROM golang:latest as build
 WORKDIR /app
 COPY database database
 COPY go.mod ./
@@ -8,7 +8,7 @@ COPY src src
 COPY main.go ./
 RUN go build -o monitoring
 
-FROM alpine:latest
+FROM debian:bullseye-slim
 WORKDIR /app
 COPY migrations migrations
 COPY --from=build /app/monitoring monitoring
