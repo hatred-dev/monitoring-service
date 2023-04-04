@@ -21,6 +21,6 @@ func RunMigrations(db *sql.DB) {
 	}
 	err = m.Up()
 	if err != nil {
-		logger.Log.Error(err)
+		logger.Log.Info(err)
 	}
 }

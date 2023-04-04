@@ -9,6 +9,8 @@ COPY main.go ./
 RUN go build -o monitoring
 
 FROM debian:bullseye-slim
+RUN apt update; apt upgrade -y
+RUN apt install -y ca-certificates
 WORKDIR /app
 COPY migrations migrations
 COPY --from=build /app/monitoring monitoring
