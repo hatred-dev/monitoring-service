@@ -4,6 +4,8 @@ import (
 	"context"
 	"monitoring-service/database"
 	sm "monitoring-service/src/services/models"
+	"net/http"
+	"time"
 )
 
 // TODO THIS SHIT NEEDS REFACTORING
@@ -13,6 +15,7 @@ var SupervisorObject = &Supervisor{}
 type Supervisor struct {
 	channels []sm.ChannelStorage
 	projects []sm.ProjectFull
+	client   *http.Client
 }
 
 // We have to store channels to gracefully shutdown function when reloading, this mitigates possibility of goroutine leakage
@@ -44,6 +47,12 @@ func (s *Supervisor) loadProjects() {
 
 func (s *Supervisor) loadServices() {
 	s.channels = make([]sm.ChannelStorage, len(s.projects))
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DisableKeepAlives = true
+	s.client = &http.Client{
+		Transport: transport,
+		Timeout:   time.Second * 30,
+	}
 	for i, v := range s.projects {
 		storage := sm.ChannelStorage{}
 		if len(v.Ips) != 0 {
@@ -54,7 +63,7 @@ func (s *Supervisor) loadServices() {
 		if len(v.Services) != 0 {
 			ch := make(chan bool, 1)
 			storage.HealthcheckChan = ch
-			go healthcheckLoop(ch, v.ProjectName, v.Services)
+			go healthcheckLoop(ch, s.client, v.ProjectName, v.Services)
 		}
 		s.channels[i] = storage
 	}

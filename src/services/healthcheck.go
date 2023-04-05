@@ -15,14 +15,8 @@ import (
 	"time"
 )
 
-func healthcheckLoop(done <-chan bool, projectName string, services []sm.Service) {
+func healthcheckLoop(done <-chan bool, client *http.Client, projectName string, services []sm.Service) {
 	ctx := context.Background()
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.DisableKeepAlives = true
-	client := &http.Client{
-		Transport: transport,
-		Timeout:   time.Second * 30,
-	}
 	ticker := time.NewTicker(time.Second * 3)
 	// cycle allows to iterate through array infinitely
 	for {
