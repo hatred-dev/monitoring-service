@@ -55,6 +55,7 @@ func healthcheck(projectName string, service *sm.Service, client *http.Client, c
 
 	if errors.As(err, &dnsError) && active {
 		message = fmt.Sprintf("`%s` hostname resolution failed", projectName)
+		logger.Log.Warn(err.Error())
 		return
 	}
 	if err, ok := err.(*url.Error); ok && active && err.Timeout() {
