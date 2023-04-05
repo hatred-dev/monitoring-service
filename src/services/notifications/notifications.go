@@ -24,7 +24,7 @@ func SendTelegramNotification(text string) {
 		logger.Log.Error(err)
 	}
 	for {
-		resp, err := http.Post(url, "application/json", bytes.NewBuffer(body))
+		resp, err = http.Post(url, "application/json", bytes.NewBuffer(body))
 		if err != nil {
 			logger.Log.Error(err)
 		}
@@ -41,7 +41,7 @@ func SendTelegramNotification(text string) {
 	if err != nil {
 		logger.Log.Error(err)
 	} else {
-		logger.Log.Infow("response", string(response))
+		logger.Log.Info(string(response))
 	}
 }
 
