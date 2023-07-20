@@ -9,7 +9,7 @@ import (
 )
 
 func CreateRouter() *echo.Echo {
-	r := CreateRouter()
+	r := echo.New()
 	r.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 	apiGroup := r.Group(configuration.AppConf.RootPrefix + "/api")
 	apiGroup.GET("/", handlers.HandleRoot)

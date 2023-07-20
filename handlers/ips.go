@@ -5,19 +5,22 @@ import (
 	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
+	"net/http"
 )
 
 func HandleCreateIP(ctx echo.Context) error {
+	projectName := ctx.Param("project_name")
 	var ip *api.CreateIPAddressReq
 	if err := ctx.Bind(&ip); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.CreateIp(ip.ProjectName, database.Ip{
+	err := repository.ProjectRepository.CreateIp(projectName, database.Ip{
 		Ip: ip.Ip,
 	})
 	if err != nil {
 		return err
 	}
+	err = ctx.JSON(http.StatusCreated, echo.Map{})
 	return nil
 }
 

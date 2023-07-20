@@ -14,26 +14,25 @@ var SupervisorObject = &Supervisor{}
 
 type Supervisor struct {
 	channels map[string]api.ChannelStorage
-	projects []database.Project
 	client   *http.Client
 }
 
 // We have to store channels to gracefully shutdown function when reloading, this mitigates possibility of goroutine leakage
 
-// TODO needs rewriting
-func (s *Supervisor) loadProjects() {
-	s.projects = repository.ProjectRepository.GetProjects()
+func loadProjects() []database.Project {
+	return repository.ProjectRepository.GetProjects()
 }
 
 func (s *Supervisor) startMonitoring() {
-	s.channels = make(map[string]api.ChannelStorage, len(s.projects))
+	projects := loadProjects()
+	s.channels = make(map[string]api.ChannelStorage, len(projects))
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.DisableKeepAlives = true
 	s.client = &http.Client{
 		Transport: transport,
 		Timeout:   time.Second * 30,
 	}
-	for _, project := range s.projects {
+	for _, project := range projects {
 		storage := api.ChannelStorage{}
 		if len(project.Ips) != 0 {
 			ch := make(chan bool, 1)
@@ -60,14 +59,9 @@ func (s *Supervisor) ReloadServices() {
 		}
 	}
 	// load projects again
-	s.startServices()
-}
-
-func (s *Supervisor) startServices() {
-	s.loadProjects()
 	s.startMonitoring()
 }
 
 func StartServices() {
-	SupervisorObject.startServices()
+	//SupervisorObject.startMonitoring()
 }

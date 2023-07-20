@@ -1,13 +1,7 @@
 package api
 
 type CreateIPAddressReq struct {
-	ProjectName string `json:"project_name" binding:"required"`
-	Ip          string `json:"ip" binding:"required"`
-}
-
-type CreateIPAddressResp struct {
-	Id string `json:"id" binding:"required"`
-	Ip string `json:"ip" binding:"required"`
+	Ip string `json:"ip" validate:"required"`
 }
 
 type UpdateIPAddressReq struct {

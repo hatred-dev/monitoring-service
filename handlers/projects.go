@@ -29,14 +29,19 @@ func HandleGetProjectByName(ctx echo.Context) error {
 func HandleCreateProject(ctx echo.Context) error {
 	var project database.Project
 	if err := ctx.Bind(&project); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
-
+	err := ctx.Validate(&project)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
 	projectCreated, err := repository.ProjectRepository.CreateProject(project)
 	if err != nil {
 		return err
 	}
-	err = ctx.JSON(http.StatusCreated, projectCreated)
+	err = ctx.JSON(http.StatusCreated, echo.Map{
+		"id": projectCreated,
+	})
 	if err != nil {
 		return err
 	}

@@ -3,15 +3,14 @@ services:
     build: .
 
   database:
-    image: postgres:15-alpine
+    image: mongo:latest
     ports:
-      - 5432:5432
+      - 27017:27017
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DATABASE: projects
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mongo-data:/data/db
 
 volumes:
-  postgres-data:
+  mongo-data:

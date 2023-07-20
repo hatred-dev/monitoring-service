@@ -1,19 +1,22 @@
 package middlewares
 
 import (
-	"fmt"
 	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"monitoring-service/services"
+	"net/http"
 )
 
 func ReloadProjects(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(context echo.Context) error {
-		fmt.Println(context)
-		if context.Request().Method != "GET" {
+		err := next(context)
+		if context.Request().Method != "GET" && err == nil {
 			services.TimerService.ResetTimer()
 		}
-		return next(context)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		}
+		return nil
 	}
 }
 

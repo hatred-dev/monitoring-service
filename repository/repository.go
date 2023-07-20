@@ -17,12 +17,6 @@ type projectRepository struct {
 	*mongo.Collection
 }
 
-func InitRepository() {
-	ProjectRepository = &projectRepository{
-		DB.Collection("projects"),
-	}
-}
-
 func setupIndexes() {
 	idxOptions := options.Index().SetUnique(true)
 	_, err := ProjectRepository.Indexes().CreateOne(context.Background(), mongo.IndexModel{
@@ -36,4 +30,11 @@ func setupIndexes() {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func InitRepository() {
+	ProjectRepository = &projectRepository{
+		DB.Collection("projects"),
+	}
+	setupIndexes()
 }

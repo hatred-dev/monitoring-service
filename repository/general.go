@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"monitoring-service/logger"
@@ -10,7 +11,7 @@ import (
 
 func (p *projectRepository) GetProjects() []database.Project {
 	var projects []database.Project
-	cursor, err := p.Find(context.Background(), bson.D{}, nil)
+	cursor, err := p.Find(context.Background(), bson.M{}, nil)
 	if err != nil {
 		return nil
 	}
@@ -70,8 +71,14 @@ func (p *projectRepository) GetIpState(ip string) bool {
 
 func (p *projectRepository) CreateIp(projectName string, ip database.Ip) error {
 	filter := bson.M{"project_name": projectName}
-	update := bson.M{"$push": bson.M{"ips": ip}}
-	_, err := p.UpdateOne(context.Background(), filter, update)
+	update := bson.M{"$addToSet": bson.M{"ips": ip}}
+	res, err := p.UpdateOne(context.Background(), filter, update)
+	if res.MatchedCount == 0 {
+		return errors.New("project not found")
+	}
+	if res.ModifiedCount == 0 {
+		return errors.New("ip already exists")
+	}
 	if err != nil {
 		return err
 	}
@@ -107,14 +114,14 @@ func (p *projectRepository) SetIpState(ip string, state bool) {
 	}
 }
 
-func (p *projectRepository) CreateService(projectName string, service database.Service) error {
+func (p *projectRepository) CreateService(projectName string, service database.Service) (primitive.ObjectID, error) {
 	filter := bson.M{"project_name": projectName}
 	update := bson.M{"$push": bson.M{"services": service}}
-	_, err := p.UpdateOne(context.Background(), filter, update)
+	res, err := p.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		return err
+		return primitive.NilObjectID, err
 	}
-	return nil
+	return res.UpsertedID.(primitive.ObjectID), nil
 }
 
 func (p *projectRepository) UpdateService(projectName, serviceName string, service database.Service) error {

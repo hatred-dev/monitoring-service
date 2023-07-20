@@ -26,7 +26,7 @@ func pingLoop(done <-chan bool, projectName string, ips []database.Ip) {
 }
 
 func ping(projectName string, ip *database.Ip) {
-	pingCmd := exec.Command("ping", ip.Ip)
+	pingCmd := exec.Command("ping", "-c2", ip.Ip)
 	pingRes, err := pingCmd.Output()
 	active := repository.ProjectRepository.GetIpState(ip.Ip)
 	var message string

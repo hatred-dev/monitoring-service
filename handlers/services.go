@@ -5,6 +5,7 @@ import (
 	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
+	"net/http"
 )
 
 func HandleCreateService(ctx echo.Context) error {
@@ -13,10 +14,13 @@ func HandleCreateService(ctx echo.Context) error {
 	if err := ctx.Bind(&service); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.CreateService(projectName, service)
+	id, err := repository.ProjectRepository.CreateService(projectName, service)
 	if err != nil {
 		return err
 	}
+	err = ctx.JSON(http.StatusCreated, echo.Map{
+		"id": id,
+	})
 	return nil
 }
 
