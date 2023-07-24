@@ -9,27 +9,30 @@ import (
 )
 
 func HandleCreateIP(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
+	project := ctx.Get("project").(database.Project)
 	var ip *api.CreateIPAddressReq
 	if err := ctx.Bind(&ip); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.CreateIp(projectName, database.Ip{
+	id, err := repository.IpRepository.CreateIp(project, database.Ip{
 		Ip: ip.Ip,
 	})
 	if err != nil {
 		return err
 	}
-	err = ctx.JSON(http.StatusCreated, echo.Map{})
+	err = ctx.JSON(http.StatusCreated, echo.Map{
+		"id": id,
+	})
 	return nil
 }
 
 func HandleUpdateIP(ctx echo.Context) error {
+	project := ctx.Get("project").(database.Project)
 	var ip *api.UpdateIPAddressReq
 	if err := ctx.Bind(&ip); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.UpdateIp(ip.Ip, ip.NewIp)
+	err := repository.IpRepository.UpdateIp(project, ip.Ip, ip.NewIp)
 	if err != nil {
 		return err
 	}
@@ -37,11 +40,15 @@ func HandleUpdateIP(ctx echo.Context) error {
 }
 
 func HandleDeleteIP(ctx echo.Context) error {
+	project := ctx.Get("project").(database.Project)
 	var ip *api.DeleteIPAddressReq
 	if err := ctx.Bind(&ip); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.DeleteIp(ip.Ip)
+	if err := ctx.Validate(&ip); err != nil {
+		return err
+	}
+	err := repository.IpRepository.DeleteIp(project, ip.Ip)
 	if err != nil {
 		return err
 	}

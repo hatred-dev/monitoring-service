@@ -33,13 +33,13 @@ func healthcheckLoop(done <-chan bool, client *http.Client, projectName string, 
 func healthcheck(projectName string, service *database.Service, client *http.Client, ctx context.Context) {
 	var dnsError *net.DNSError
 	var message string
-	active := repository.ProjectRepository.GetServiceState(projectName, service.ServiceName)
+	active := repository.ServiceRepository.GetServiceState(projectName, service.ServiceName)
 	resp, err := client.Get(service.Url)
 
 	defer func() {
 		if message != "" {
 			notifications.SendNotifications(projectName, service.ServiceName, message, !active)
-			repository.ProjectRepository.SetServiceState(projectName, service.ServiceName, !active)
+			repository.ServiceRepository.SetServiceState(projectName, service.ServiceName, !active)
 		}
 		if resp != nil {
 			err := resp.Body.Close()

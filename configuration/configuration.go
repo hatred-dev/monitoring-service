@@ -59,11 +59,13 @@ func initUptimeConfig() {
 
 type AppConfiguration struct {
 	RootPrefix string
+	ApiKey     string
 }
 
 func initAppConfiguration() {
 	AppConf = &AppConfiguration{
 		RootPrefix: getEnvOrDefault("", "root_prefix", ""),
+		ApiKey:     getEnvOrDefault("", "api_key", ""),
 	}
 }
 

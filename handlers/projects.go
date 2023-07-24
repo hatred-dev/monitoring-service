@@ -18,8 +18,11 @@ func HandleGetProjects(ctx echo.Context) error {
 
 func HandleGetProjectByName(ctx echo.Context) error {
 	projectName := ctx.Param("project_name")
-	project := repository.ProjectRepository.GetProjectByName(projectName)
-	err := ctx.JSON(http.StatusOK, project)
+	project, err := repository.ProjectRepository.GetProjectByName(projectName)
+	if err != nil {
+		return err
+	}
+	err = ctx.JSON(http.StatusOK, project)
 	if err != nil {
 		return err
 	}
@@ -29,11 +32,11 @@ func HandleGetProjectByName(ctx echo.Context) error {
 func HandleCreateProject(ctx echo.Context) error {
 	var project database.Project
 	if err := ctx.Bind(&project); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return err
 	}
 	err := ctx.Validate(&project)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return err
 	}
 	projectCreated, err := repository.ProjectRepository.CreateProject(project)
 	if err != nil {
@@ -52,6 +55,9 @@ func HandlePatchProject(ctx echo.Context) error {
 	projectName := ctx.Param("project_name")
 	var newProject database.Project
 	if err := ctx.Bind(&newProject); err != nil {
+		return err
+	}
+	if err := ctx.Validate(&newProject); err != nil {
 		return err
 	}
 	err := repository.ProjectRepository.UpdateProject(projectName, newProject)

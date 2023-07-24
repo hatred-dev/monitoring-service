@@ -2,6 +2,7 @@ package services
 
 import (
 	"monitoring-service/logger"
+	"sync"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type ReloadTimer struct {
 	shouldReload bool
 	ticker       *time.Ticker
 	resetChan    chan bool
+	mu           sync.Mutex
 }
 
 func NewTimerService() ReloadTimer {
@@ -21,22 +23,34 @@ func NewTimerService() ReloadTimer {
 	}
 }
 
-func (t *ReloadTimer) ResetTimer() {
+func (t *ReloadTimer) TriggerReset() {
 	t.resetChan <- true
 }
 
-func (t *ReloadTimer) StartTimer() {
+func (t *ReloadTimer) Reset() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.ticker.Reset(time.Second * 10)
+	t.shouldReload = true
+}
+
+func (t *ReloadTimer) Reload() {
+	if !t.shouldReload {
+		return
+	}
+	logger.Log.Info("Reloading...")
+	SupervisorObject.ReloadServices()
+	t.shouldReload = false
+}
+
+func (t *ReloadTimer) Watch() {
+	defer t.ticker.Stop()
 	for {
 		select {
 		case <-t.resetChan:
-			t.ticker.Reset(time.Second * 10)
-			t.shouldReload = true
+			t.Reset()
 		case <-t.ticker.C:
-			if t.shouldReload {
-				logger.Log.Info("Reloading...")
-				SupervisorObject.ReloadServices()
-				t.shouldReload = false
-			}
+			t.Reload()
 		}
 	}
 }

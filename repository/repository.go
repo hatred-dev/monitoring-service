@@ -11,9 +11,19 @@ import (
 var (
 	DB                *mongo.Database
 	ProjectRepository *projectRepository
+	ServiceRepository *serviceRepository
+	IpRepository      *ipRepository
 )
 
 type projectRepository struct {
+	*mongo.Collection
+}
+
+type serviceRepository struct {
+	*mongo.Collection
+}
+
+type ipRepository struct {
 	*mongo.Collection
 }
 
@@ -22,8 +32,20 @@ func setupIndexes() {
 	_, err := ProjectRepository.Indexes().CreateOne(context.Background(), mongo.IndexModel{
 		Keys: bson.D{
 			{"project_name", 1},
-			{"ips.ip", 1},
-			{"services.url", 1},
+		},
+		Options: idxOptions,
+	})
+	_, err = ServiceRepository.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{"project_id", 1},
+			{"url", 1},
+		},
+		Options: idxOptions,
+	})
+	_, err = IpRepository.Indexes().CreateOne(context.Background(), mongo.IndexModel{
+		Keys: bson.D{
+			{"project_id", 1},
+			{"ip", 1},
 		},
 		Options: idxOptions,
 	})
@@ -35,6 +57,12 @@ func setupIndexes() {
 func InitRepository() {
 	ProjectRepository = &projectRepository{
 		DB.Collection("projects"),
+	}
+	ServiceRepository = &serviceRepository{
+		DB.Collection("services"),
+	}
+	IpRepository = &ipRepository{
+		DB.Collection("ips"),
 	}
 	setupIndexes()
 }

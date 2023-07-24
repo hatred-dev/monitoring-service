@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"monitoring-service/configuration"
 	"monitoring-service/logger"
 	"monitoring-service/repository"
 	"monitoring-service/router"
 	"monitoring-service/services"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func init() {
 	configuration.InitConfigurations()
 	logger.InitLogger()
-	go services.TimerService.StartTimer()
+	go services.TimerService.Watch()
 }
 
 func main() {

@@ -28,13 +28,13 @@ func pingLoop(done <-chan bool, projectName string, ips []database.Ip) {
 func ping(projectName string, ip *database.Ip) {
 	pingCmd := exec.Command("ping", "-c2", ip.Ip)
 	pingRes, err := pingCmd.Output()
-	active := repository.ProjectRepository.GetIpState(ip.Ip)
+	active := repository.IpRepository.GetIpState(ip)
 	var message string
 
 	defer func() {
 		if message != "" {
 			notifications.SendNotifications(projectName, "server", message, !active)
-			repository.ProjectRepository.SetIpState(ip.Ip, !active)
+			repository.IpRepository.SetIpState(ip.Ip, !active)
 		}
 		logger.Log.Infof("%s %s checked", projectName, ip.Ip)
 	}()

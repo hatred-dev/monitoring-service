@@ -9,12 +9,15 @@ import (
 )
 
 func HandleCreateService(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
+	project := ctx.Get("project").(database.Project)
 	var service database.Service
 	if err := ctx.Bind(&service); err != nil {
 		return err
 	}
-	id, err := repository.ProjectRepository.CreateService(projectName, service)
+	if err := ctx.Validate(&service); err != nil {
+		return err
+	}
+	id, err := repository.ServiceRepository.CreateService(project, service)
 	if err != nil {
 		return err
 	}
@@ -25,16 +28,22 @@ func HandleCreateService(ctx echo.Context) error {
 }
 
 func HandlePatchService(ctx echo.Context) error {
+	//projectName := ctx.Param("project_name")
+	//var service *api.UpdateServiceReq
+	//if err := ctx.Bind(&service); err != nil {
+	//	return err
+	//}
+	//
 	return nil
 }
 
 func HandleDeleteService(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
+	project := ctx.Get("project").(database.Project)
 	var service *api.DeleteServiceReq
 	if err := ctx.Bind(&service); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.DeleteService(projectName, service.ServiceName)
+	err := repository.ServiceRepository.DeleteService(project, service.ServiceName)
 	if err != nil {
 		return err
 	}
