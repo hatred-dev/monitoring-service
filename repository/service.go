@@ -40,8 +40,8 @@ func (s *serviceRepository) UpdateService(project database.Project, serviceName 
 
 func (s *serviceRepository) DeleteService(project database.Project, serviceName string) error {
 	filter := bson.D{
-		{"project_name", project.ProjectName},
-		{"services.service_name", serviceName},
+		{"project_id", project.ID},
+		{"service_name", serviceName},
 	}
 	_, err := s.DeleteOne(context.Background(), filter)
 	if err != nil {
@@ -50,11 +50,10 @@ func (s *serviceRepository) DeleteService(project database.Project, serviceName 
 	return nil
 }
 
-func (s *serviceRepository) GetServiceState(project, name string) bool {
+func (s *serviceRepository) GetServiceState(service *database.Service) bool {
 	var serviceObj database.Service
-	filter := bson.D{
-		{"project_name", project},
-		{"services.service_name", name},
+	filter := bson.M{
+		"_id": service.ID,
 	}
 	err := s.FindOne(context.Background(), filter).Decode(&serviceObj)
 	if err != nil {
@@ -63,12 +62,11 @@ func (s *serviceRepository) GetServiceState(project, name string) bool {
 	return serviceObj.Active
 }
 
-func (s *serviceRepository) SetServiceState(project, name string, state bool) {
-	filter := bson.D{
-		{"project_name", project},
-		{"services.service_name", name},
+func (s *serviceRepository) SetServiceState(service *database.Service, state bool) {
+	filter := bson.M{
+		"_id": service.ID,
 	}
-	update := bson.M{"$set": bson.M{"services.$.active": state}}
+	update := bson.M{"$set": bson.M{"active": state}}
 	_, err := s.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		logger.Log.Warn(err)

@@ -17,12 +17,8 @@ func HandleGetProjects(ctx echo.Context) error {
 }
 
 func HandleGetProjectByName(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
-	project, err := repository.ProjectRepository.GetProjectByName(projectName)
-	if err != nil {
-		return err
-	}
-	err = ctx.JSON(http.StatusOK, project)
+	project := ctx.Get("project").(database.Project)
+	err := ctx.JSON(http.StatusOK, project)
 	if err != nil {
 		return err
 	}
@@ -52,7 +48,7 @@ func HandleCreateProject(ctx echo.Context) error {
 }
 
 func HandlePatchProject(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
+	project := ctx.Get("project").(database.Project)
 	var newProject database.Project
 	if err := ctx.Bind(&newProject); err != nil {
 		return err
@@ -60,7 +56,7 @@ func HandlePatchProject(ctx echo.Context) error {
 	if err := ctx.Validate(&newProject); err != nil {
 		return err
 	}
-	err := repository.ProjectRepository.UpdateProject(projectName, newProject)
+	err := repository.ProjectRepository.UpdateProject(project, newProject)
 	if err != nil {
 		return err
 	}
@@ -68,8 +64,8 @@ func HandlePatchProject(ctx echo.Context) error {
 }
 
 func HandleDeleteProject(ctx echo.Context) error {
-	projectName := ctx.Param("project_name")
-	err := repository.ProjectRepository.DeleteProject(projectName)
+	project := ctx.Get("project").(database.Project)
+	err := repository.ProjectRepository.DeleteProject(project)
 	if err != nil {
 		return err
 	}

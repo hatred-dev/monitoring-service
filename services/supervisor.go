@@ -59,9 +59,9 @@ func (s *Supervisor) ReloadServices() {
 		}
 	}
 	// load projects again
-	// s.startMonitoring()
+	s.startMonitoring()
 }
 
 func StartServices() {
-	//SupervisorObject.startMonitoring()
+	SupervisorObject.startMonitoring()
 }

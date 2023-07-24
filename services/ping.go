@@ -34,7 +34,7 @@ func ping(projectName string, ip *database.Ip) {
 	defer func() {
 		if message != "" {
 			notifications.SendNotifications(projectName, "server", message, !active)
-			repository.IpRepository.SetIpState(ip.Ip, !active)
+			repository.IpRepository.SetIpState(ip, !active)
 		}
 		logger.Log.Infof("%s %s checked", projectName, ip.Ip)
 	}()

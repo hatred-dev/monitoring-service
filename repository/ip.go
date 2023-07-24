@@ -65,9 +65,11 @@ func (i *ipRepository) DeleteIp(project database.Project, ip string) error {
 	return nil
 }
 
-func (i *ipRepository) SetIpState(ip string, state bool) {
-	filter := bson.M{"ips.ip": ip}
-	update := bson.M{"$set": bson.M{"ips.$.active": state}}
+func (i *ipRepository) SetIpState(ip *database.Ip, state bool) {
+	filter := bson.M{
+		"_id": ip.ID,
+	}
+	update := bson.M{"$set": bson.M{"active": state}}
 	_, err := i.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		logger.Log.Warn(err)

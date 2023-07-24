@@ -24,6 +24,7 @@ func ReloadProjects(next echo.HandlerFunc) echo.HandlerFunc {
 }
 
 func ProjectExists(next echo.HandlerFunc) echo.HandlerFunc {
+	// if project exists, set it to current context to fetch later
 	return func(context echo.Context) error {
 		projectName := context.Param("project_name")
 		if projectName == "" {

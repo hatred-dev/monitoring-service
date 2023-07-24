@@ -92,9 +92,9 @@ func (p *projectRepository) CreateProject(project database.Project) (primitive.O
 	return id, nil
 }
 
-func (p *projectRepository) UpdateProject(projectName string, project database.Project) error {
-	filter := bson.M{"project_name": projectName}
-	update := bson.M{"$set": project}
+func (p *projectRepository) UpdateProject(project, newProject database.Project) error {
+	filter := bson.M{"_id": project.ID}
+	update := bson.M{"$set": newProject}
 	_, err := p.UpdateOne(context.Background(), filter, update)
 	if err != nil {
 		return err
@@ -102,11 +102,25 @@ func (p *projectRepository) UpdateProject(projectName string, project database.P
 	return nil
 }
 
-func (p *projectRepository) DeleteProject(projectName string) error {
-	filter := bson.M{"project_name": projectName}
+func (p *projectRepository) DeleteProject(project database.Project) error {
+	filter := bson.M{"_id": project.ID}
 	_, err := p.DeleteOne(context.Background(), filter)
 	if err != nil {
 		return err
+	}
+	filter = bson.M{
+		"name": bson.M{
+			"$ne": p.Collection.Name(),
+		},
+	}
+	collections, err := DB.ListCollectionNames(context.Background(), filter)
+	if err != nil {
+		return err
+	}
+	for _, collection := range collections {
+		collection := DB.Collection(collection, nil)
+		filter := bson.M{"project_id": project.ID}
+		_, err = collection.DeleteMany(context.Background(), filter)
 	}
 	return nil
 }

@@ -28,12 +28,15 @@ func HandleCreateService(ctx echo.Context) error {
 }
 
 func HandlePatchService(ctx echo.Context) error {
-	//projectName := ctx.Param("project_name")
-	//var service *api.UpdateServiceReq
-	//if err := ctx.Bind(&service); err != nil {
-	//	return err
-	//}
-	//
+	project := ctx.Get("project").(database.Project)
+	var service *api.UpdateServiceReq
+	if err := ctx.Bind(&service); err != nil {
+		return err
+	}
+	err := repository.ServiceRepository.UpdateService(project, service.ServiceName, service.Settings)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

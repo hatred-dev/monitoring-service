@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"monitoring-service/logger"
@@ -14,7 +13,6 @@ import (
 )
 
 func healthcheckLoop(done <-chan bool, client *http.Client, projectName string, services []database.Service) {
-	ctx := context.Background()
 	// cycle allows to iterate through array infinitely
 	for {
 		select {
@@ -24,22 +22,22 @@ func healthcheckLoop(done <-chan bool, client *http.Client, projectName string, 
 			return
 		default:
 			for _, v := range services {
-				healthcheck(projectName, &v, client, ctx)
+				healthcheck(projectName, &v, client)
 			}
 		}
 	}
 }
 
-func healthcheck(projectName string, service *database.Service, client *http.Client, ctx context.Context) {
+func healthcheck(projectName string, service *database.Service, client *http.Client) {
 	var dnsError *net.DNSError
 	var message string
-	active := repository.ServiceRepository.GetServiceState(projectName, service.ServiceName)
+	active := repository.ServiceRepository.GetServiceState(service)
 	resp, err := client.Get(service.Url)
 
 	defer func() {
 		if message != "" {
 			notifications.SendNotifications(projectName, service.ServiceName, message, !active)
-			repository.ServiceRepository.SetServiceState(projectName, service.ServiceName, !active)
+			repository.ServiceRepository.SetServiceState(service, !active)
 		}
 		if resp != nil {
 			err := resp.Body.Close()
@@ -62,15 +60,15 @@ func healthcheck(projectName string, service *database.Service, client *http.Cli
 	if resp == nil {
 		return
 	}
-	if resp.StatusCode == 500 && active {
+	if resp.StatusCode == http.StatusInternalServerError && active {
 		message = fmt.Sprintf("🚫️WARNING🚫️\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.ServiceName)
 		return
 	}
-	if resp.StatusCode == 404 && active {
+	if resp.StatusCode == http.StatusNotFound && active {
 		message = fmt.Sprintf("⚠️WARNING⚠️\n`%s %s`\nIS INACCESSIBLE", projectName, service.ServiceName)
 		return
 	}
-	if resp.StatusCode == 200 && !active {
+	if resp.StatusCode == http.StatusOK && !active {
 		message = fmt.Sprintf("🌀GOOD NEWS🌀\n`%s %s`\nIS UP", projectName, service.ServiceName)
 		return
 	}
