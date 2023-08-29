@@ -11,6 +11,21 @@ import (
 	"monitoring-service/models/database"
 )
 
+func (i *ipRepository) GetIps(project *database.Project) []database.Ip {
+	var ips []database.Ip
+	opts := options.Find().SetProjection(bson.M{"_id": 0, "ip": 1, "active": 1})
+	filter := bson.M{"project_id": project.ID}
+	cur, err := i.Find(context.Background(), filter, opts)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
+	err = cur.All(context.Background(), &ips)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
+	return ips
+}
+
 func (i *ipRepository) CreateIp(project database.Project, ip database.Ip) (primitive.ObjectID, error) {
 	ip.ProjectID = project.ID
 	res, err := i.InsertOne(context.Background(), ip)

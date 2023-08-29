@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+func HandleGetIPs(ctx echo.Context) error {
+	project := ctx.Get("project").(database.Project)
+	ips := repository.IpRepository.GetIps(&project)
+	err := ctx.JSON(http.StatusOK, ips)
+	return err
+}
+
 func HandleCreateIP(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var ip *api.CreateIPAddressReq
@@ -23,7 +30,7 @@ func HandleCreateIP(ctx echo.Context) error {
 	err = ctx.JSON(http.StatusCreated, echo.Map{
 		"id": id,
 	})
-	return nil
+	return err
 }
 
 func HandleUpdateIP(ctx echo.Context) error {
@@ -33,10 +40,7 @@ func HandleUpdateIP(ctx echo.Context) error {
 		return err
 	}
 	err := repository.IpRepository.UpdateIp(project, ip.Ip, ip.NewIp)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func HandleDeleteIP(ctx echo.Context) error {
@@ -49,8 +53,5 @@ func HandleDeleteIP(ctx echo.Context) error {
 		return err
 	}
 	err := repository.IpRepository.DeleteIp(project, ip.Ip)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

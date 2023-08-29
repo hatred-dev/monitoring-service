@@ -10,19 +10,13 @@ import (
 func HandleGetProjects(ctx echo.Context) error {
 	projects := repository.ProjectRepository.GetProjects()
 	err := ctx.JSON(http.StatusOK, projects)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func HandleGetProjectByName(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	err := ctx.JSON(http.StatusOK, project)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func HandleCreateProject(ctx echo.Context) error {
@@ -41,10 +35,7 @@ func HandleCreateProject(ctx echo.Context) error {
 	err = ctx.JSON(http.StatusCreated, echo.Map{
 		"id": projectCreated,
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func HandlePatchProject(ctx echo.Context) error {
@@ -57,17 +48,11 @@ func HandlePatchProject(ctx echo.Context) error {
 		return err
 	}
 	err := repository.ProjectRepository.UpdateProject(project, newProject)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func HandleDeleteProject(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	err := repository.ProjectRepository.DeleteProject(project)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"monitoring-service/configuration"
 	"monitoring-service/repository"
 	"monitoring-service/services"
@@ -54,7 +55,8 @@ type CustomValidator struct {
 }
 
 func (cv *CustomValidator) Validate(i any) error {
-	if errs, ok := cv.Validator.Struct(i).(validator.ValidationErrors); ok {
+	var errs validator.ValidationErrors
+	if errors.As(cv.Validator.Struct(i), &errs) {
 		if errs != nil {
 			for _, err := range errs {
 				if fe, ok := err.(validator.FieldError); ok {

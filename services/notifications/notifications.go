@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func SendTelegramNotification(text string) {
+func SendTelegramNotification(text string) error {
 	var resp *http.Response
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", configuration.TGConfig.BotToken)
 	body, err := json.Marshal(sm.TelegramMessage{
@@ -21,12 +21,12 @@ func SendTelegramNotification(text string) {
 		ChatId:    configuration.TGConfig.ChatId,
 	})
 	if err != nil {
-		logger.Log.Error(err)
+		return err
 	}
 	for {
 		resp, err = http.Post(url, "application/json", bytes.NewBuffer(body))
 		if err != nil {
-			logger.Log.Error(err)
+			return err
 		}
 		if resp.StatusCode == http.StatusTooManyRequests {
 			time.Sleep(time.Second * 5)
@@ -39,18 +39,16 @@ func SendTelegramNotification(text string) {
 		response, err = io.ReadAll(resp.Body)
 	}
 	if err != nil {
-		logger.Log.Error(err)
-	} else {
-		logger.Log.Info(string(response))
+		return err
 	}
+	logger.Log.Info(string(response))
+	return nil
 }
 
-func SendUptimeNotification(projectKey, service string, state bool) {
-	var status string
+func SendUptimeNotification(projectKey, service string, state bool) error {
+	status := "error"
 	if state {
 		status = "active"
-	} else {
-		status = "error"
 	}
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02T15:04:05.999Z")
@@ -61,8 +59,7 @@ func SendUptimeNotification(projectKey, service string, state bool) {
 		Timestamp:  formattedTime,
 	})
 	if err != nil {
-		logger.Log.Error(err)
-		return
+		return err
 	}
 	resp, err := http.Post(
 		configuration.UptimeConf.UptimeUrl,
@@ -70,13 +67,20 @@ func SendUptimeNotification(projectKey, service string, state bool) {
 		bytes.NewBuffer(body),
 	)
 	if err != nil {
-		logger.Log.Warnln("Failed to sent uptime notification, cause:", err.Error())
+		return err
 	}
 	response, _ := io.ReadAll(resp.Body)
 	logger.Log.Info(response)
+	return nil
 }
 
 func SendNotifications(projectName, serviceName, message string, active bool) {
-	SendTelegramNotification(message)
-	SendUptimeNotification(projectName, serviceName, !active)
+	err := SendTelegramNotification(message)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
+	err = SendUptimeNotification(projectName, serviceName, !active)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
 }

@@ -17,5 +17,5 @@ type DeleteIPAddressReq struct {
 
 type UpdateServiceReq struct {
 	ServiceName string           `json:"service_name" binding:"required"`
-	Settings    database.Service `json:"settings" binding:"required"`
+	Service     database.Service `json:"settings" binding:"required"`
 }

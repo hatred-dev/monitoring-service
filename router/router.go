@@ -18,20 +18,26 @@ func CreateRouter() *echo.Echo {
 	{
 		projects := apiGroup.Group("/projects")
 		{
-			// Project operations
+			// All projects operations
 			projects.POST("", handlers.HandleCreateProject)
 			projects.GET("", handlers.HandleGetProjects)
-			projects.GET("/:project_name", handlers.HandleGetProjectByName)
-			projects.PATCH("/:project_name", handlers.HandlePatchProject)
-			projects.DELETE("/:project_name", handlers.HandleDeleteProject)
-			// Ip operations
-			projects.POST("/:project_name/ips", handlers.HandleCreateIP)
-			projects.PATCH("/:project_name/ips", handlers.HandleUpdateIP)
-			projects.DELETE("/:project_name/ips", handlers.HandleDeleteIP)
-			// Service operations
-			projects.POST("/:project_name/services", handlers.HandleCreateService)
-			projects.PATCH("/:project_name/services", handlers.HandlePatchService)
-			projects.DELETE("/:project_name/services", handlers.HandleDeleteService)
+			// Specific project operations
+			project := projects.Group("/:project_name")
+			{
+				project.GET("", handlers.HandleGetProjectByName)
+				project.PATCH("", handlers.HandlePatchProject)
+				project.DELETE("", handlers.HandleDeleteProject)
+				// Ip operations
+				project.GET("/ips", handlers.HandleGetIPs)
+				project.POST("/ips", handlers.HandleCreateIP)
+				project.PATCH("/ips", handlers.HandleUpdateIP)
+				project.DELETE("/ips", handlers.HandleDeleteIP)
+				// Service operations
+				project.GET("/services", handlers.HandleGetServices)
+				project.POST("/services", handlers.HandleCreateService)
+				project.PATCH("/services", handlers.HandlePatchService)
+				project.DELETE("/services", handlers.HandleDeleteService)
+			}
 		}
 	}
 	return r

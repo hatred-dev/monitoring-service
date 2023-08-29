@@ -8,6 +8,13 @@ import (
 	"net/http"
 )
 
+func HandleGetServices(ctx echo.Context) error {
+	project := ctx.Get("project").(database.Project)
+	services := repository.ServiceRepository.GetServices(&project)
+	err := ctx.JSON(http.StatusOK, services)
+	return err
+}
+
 func HandleCreateService(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var service database.Service
@@ -24,7 +31,7 @@ func HandleCreateService(ctx echo.Context) error {
 	err = ctx.JSON(http.StatusCreated, echo.Map{
 		"id": id,
 	})
-	return nil
+	return err
 }
 
 func HandlePatchService(ctx echo.Context) error {
@@ -33,11 +40,8 @@ func HandlePatchService(ctx echo.Context) error {
 	if err := ctx.Bind(&service); err != nil {
 		return err
 	}
-	err := repository.ServiceRepository.UpdateService(project, service.ServiceName, service.Settings)
-	if err != nil {
-		return err
-	}
-	return nil
+	err := repository.ServiceRepository.UpdateService(project, service.ServiceName, service.Service)
+	return err
 }
 
 func HandleDeleteService(ctx echo.Context) error {
@@ -47,8 +51,5 @@ func HandleDeleteService(ctx echo.Context) error {
 		return err
 	}
 	err := repository.ServiceRepository.DeleteService(project, service.ServiceName)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

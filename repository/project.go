@@ -29,7 +29,7 @@ func (p *projectRepository) GetProjects() []database.Project {
 	if err != nil {
 		return nil
 	}
-	if err != cursor.All(context.Background(), &projects) {
+	if !errors.Is(err, cursor.All(context.Background(), &projects)) {
 		return nil
 	}
 	return projects
@@ -40,7 +40,7 @@ func (p *projectRepository) ProjectExists(projectName string) (database.Project,
 	filter := bson.M{"project_name": projectName}
 	err := p.FindOne(context.Background(), filter).Decode(&project)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return database.Project{}, errors.New("project not found")
 		}
 		return database.Project{}, err
@@ -67,7 +67,7 @@ func (p *projectRepository) GetProjectByName(projectName string) (database.Proje
 	}
 	cur, err := p.Aggregate(context.Background(), pipeline)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if errors.Is(err, mongo.ErrNoDocuments) {
 			return database.Project{}, errors.New("project not found")
 		}
 	}

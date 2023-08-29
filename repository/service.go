@@ -6,9 +6,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"monitoring-service/logger"
 	"monitoring-service/models/database"
 )
+
+func (s *serviceRepository) GetServices(project *database.Project) []database.Service {
+	var services []database.Service
+	opts := options.Find().SetProjection(bson.M{"_id": 0, "service_name": 1, "active": 1})
+	filter := bson.M{"project_id": project.ID}
+	cur, err := s.Find(context.Background(), filter, opts)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
+	err = cur.All(context.Background(), &services)
+	if err != nil {
+		logger.Log.Warn(err)
+	}
+	return services
+}
 
 func (s *serviceRepository) CreateService(project database.Project, service database.Service) (primitive.ObjectID, error) {
 	service.ProjectID = project.ID
