@@ -29,7 +29,7 @@ func (p *projectRepository) GetProjects() []database.Project {
 	if err != nil {
 		return nil
 	}
-	if !errors.Is(err, cursor.All(context.Background(), &projects)) {
+	if err := cursor.All(context.Background(), &projects); err != nil {
 		return nil
 	}
 	return projects
