@@ -5,6 +5,7 @@ import (
 	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
+	"monitoring-service/utils"
 	"net/http"
 )
 
@@ -18,10 +19,7 @@ func HandleGetServices(ctx echo.Context) error {
 func HandleCreateService(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var service database.Service
-	if err := ctx.Bind(&service); err != nil {
-		return err
-	}
-	if err := ctx.Validate(&service); err != nil {
+	if err := utils.BindAndValidate(ctx, &service); err != nil {
 		return err
 	}
 	id, err := repository.ServiceRepository.CreateService(project, service)
@@ -37,7 +35,7 @@ func HandleCreateService(ctx echo.Context) error {
 func HandlePatchService(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var service *api.UpdateServiceReq
-	if err := ctx.Bind(&service); err != nil {
+	if err := utils.BindAndValidate(ctx, &service); err != nil {
 		return err
 	}
 	err := repository.ServiceRepository.UpdateService(project, service.ServiceName, service.Service)
@@ -47,7 +45,7 @@ func HandlePatchService(ctx echo.Context) error {
 func HandleDeleteService(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var service *api.DeleteServiceReq
-	if err := ctx.Bind(&service); err != nil {
+	if err := utils.BindAndValidate(ctx, &service); err != nil {
 		return err
 	}
 	err := repository.ServiceRepository.DeleteService(project, service.ServiceName)

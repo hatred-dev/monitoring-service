@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
+	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
+	"monitoring-service/utils"
 	"net/http"
 )
 
@@ -21,11 +23,7 @@ func HandleGetProjectByName(ctx echo.Context) error {
 
 func HandleCreateProject(ctx echo.Context) error {
 	var project database.Project
-	if err := ctx.Bind(&project); err != nil {
-		return err
-	}
-	err := ctx.Validate(&project)
-	if err != nil {
+	if err := utils.BindAndValidate(ctx, &project); err != nil {
 		return err
 	}
 	projectCreated, err := repository.ProjectRepository.CreateProject(project)
@@ -40,11 +38,8 @@ func HandleCreateProject(ctx echo.Context) error {
 
 func HandlePatchProject(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
-	var newProject database.Project
-	if err := ctx.Bind(&newProject); err != nil {
-		return err
-	}
-	if err := ctx.Validate(&newProject); err != nil {
+	var newProject api.Project
+	if err := utils.BindAndValidate(ctx, &newProject); err != nil {
 		return err
 	}
 	err := repository.ProjectRepository.UpdateProject(project, newProject)

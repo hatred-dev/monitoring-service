@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 )
 
@@ -92,7 +93,7 @@ func (p *projectRepository) CreateProject(project database.Project) (primitive.O
 	return id, nil
 }
 
-func (p *projectRepository) UpdateProject(project, newProject database.Project) error {
+func (p *projectRepository) UpdateProject(project database.Project, newProject api.Project) error {
 	filter := bson.M{"_id": project.ID}
 	update := bson.M{"$set": newProject}
 	_, err := p.UpdateOne(context.Background(), filter, update)

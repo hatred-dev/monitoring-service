@@ -5,6 +5,7 @@ import (
 	"monitoring-service/models/api"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
+	"monitoring-service/utils"
 	"net/http"
 )
 
@@ -18,7 +19,7 @@ func HandleGetIPs(ctx echo.Context) error {
 func HandleCreateIP(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var ip *api.CreateIPAddressReq
-	if err := ctx.Bind(&ip); err != nil {
+	if err := utils.BindAndValidate(ctx, &ip); err != nil {
 		return err
 	}
 	id, err := repository.IpRepository.CreateIp(project, database.Ip{
@@ -36,7 +37,7 @@ func HandleCreateIP(ctx echo.Context) error {
 func HandleUpdateIP(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var ip *api.UpdateIPAddressReq
-	if err := ctx.Bind(&ip); err != nil {
+	if err := utils.BindAndValidate(ctx, &ip); err != nil {
 		return err
 	}
 	err := repository.IpRepository.UpdateIp(project, ip.Ip, ip.NewIp)
@@ -46,10 +47,7 @@ func HandleUpdateIP(ctx echo.Context) error {
 func HandleDeleteIP(ctx echo.Context) error {
 	project := ctx.Get("project").(database.Project)
 	var ip *api.DeleteIPAddressReq
-	if err := ctx.Bind(&ip); err != nil {
-		return err
-	}
-	if err := ctx.Validate(&ip); err != nil {
+	if err := utils.BindAndValidate(ctx, &ip); err != nil {
 		return err
 	}
 	err := repository.IpRepository.DeleteIp(project, ip.Ip)
