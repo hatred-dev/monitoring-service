@@ -51,8 +51,8 @@ func (i *ipRepository) GetIpState(ip *database.Ip) bool {
 
 func (i *ipRepository) UpdateIp(project database.Project, oldIp, newIp string) error {
 	filter := bson.D{
-		{"project_id", project.ID},
-		{"ip", oldIp},
+		{Key: "project_id", Value: project.ID},
+		{Key: "ip", Value: oldIp},
 	}
 	update := bson.M{"$set": bson.M{"ip": newIp}}
 	res, err := i.UpdateOne(context.Background(), filter, update)
@@ -67,8 +67,8 @@ func (i *ipRepository) UpdateIp(project database.Project, oldIp, newIp string) e
 
 func (i *ipRepository) DeleteIp(project database.Project, ip string) error {
 	filter := bson.D{
-		{"project_id", project.ID},
-		{"ip", ip},
+		{Key: "project_id", Value: project.ID},
+		{Key: "ip", Value: ip},
 	}
 	res, err := i.DeleteOne(context.Background(), filter)
 	if err != nil {

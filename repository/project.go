@@ -3,23 +3,24 @@ package repository
 import (
 	"context"
 	"errors"
+	"monitoring-service/models/api"
+	"monitoring-service/models/database"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"monitoring-service/models/api"
-	"monitoring-service/models/database"
 )
 
 func (p *projectRepository) GetProjects() []database.Project {
 	var projects []database.Project
 	pipeline := mongo.Pipeline{
-		{{"$lookup", bson.M{
+		{{Key: "$lookup", Value: bson.M{
 			"from":         "ips",
 			"localField":   "_id",
 			"foreignField": "project_id",
 			"as":           "ips",
 		}}},
-		{{"$lookup", bson.M{
+		{{Key: "$lookup", Value: bson.M{
 			"from":         "services",
 			"localField":   "_id",
 			"foreignField": "project_id",
@@ -52,14 +53,14 @@ func (p *projectRepository) ProjectExists(projectName string) (database.Project,
 func (p *projectRepository) GetProjectByName(projectName string) (database.Project, error) {
 	var project database.Project
 	pipeline := mongo.Pipeline{
-		{{"$match", bson.M{"project_name": projectName}}},
-		{{"$lookup", bson.M{
+		{{Key: "$match", Value: bson.M{"project_name": projectName}}},
+		{{Key: "$lookup", Value: bson.M{
 			"from":         "ips",
 			"localField":   "_id",
 			"foreignField": "project_id",
 			"as":           "ips",
 		}}},
-		{{"$lookup", bson.M{
+		{{Key: "$lookup", Value: bson.M{
 			"from":         "services",
 			"localField":   "_id",
 			"foreignField": "project_id",
@@ -121,7 +122,7 @@ func (p *projectRepository) DeleteProject(project database.Project) error {
 	for _, collection := range collections {
 		collection := DB.Collection(collection, nil)
 		filter := bson.M{"project_id": project.ID}
-		_, err = collection.DeleteMany(context.Background(), filter)
+		_, _ = collection.DeleteMany(context.Background(), filter)
 	}
 	return nil
 }

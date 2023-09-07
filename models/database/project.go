@@ -11,3 +11,11 @@ type Project struct {
 	Services    []Service          `bson:"services,omitempty" json:"services,omitempty"`
 	Active      bool               `bson:"active" json:"active" validate:"required"`
 }
+
+func (p *Project) IpsEmpty() bool {
+	return len(p.Ips) == 0
+}
+
+func (p *Project) ServicesEmpty() bool {
+	return len(p.Services) == 0
+}

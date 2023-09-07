@@ -7,7 +7,7 @@ import (
 	"io"
 	"monitoring-service/configuration"
 	"monitoring-service/logger"
-	sm "monitoring-service/models/api"
+	"monitoring-service/models/api"
 	"net/http"
 	"time"
 )
@@ -15,7 +15,7 @@ import (
 func SendTelegramNotification(text string) error {
 	var resp *http.Response
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", configuration.TGConfig.BotToken)
-	body, err := json.Marshal(sm.TelegramMessage{
+	body, err := json.Marshal(api.TelegramMessage{
 		ParseMode: "MarkdownV2",
 		Text:      text,
 		ChatId:    configuration.TGConfig.ChatId,
@@ -52,7 +52,7 @@ func SendUptimeNotification(projectKey, service string, state bool) error {
 	}
 	currentTime := time.Now()
 	formattedTime := currentTime.Format("2006-01-02T15:04:05.999Z")
-	body, err := json.Marshal(sm.UptimeNotification{
+	body, err := json.Marshal(api.UptimeNotification{
 		ProjectKey: projectKey,
 		Service:    service,
 		Status:     status,

@@ -6,11 +6,6 @@ type TelegramMessage struct {
 	ChatId    string `json:"chat_id"`
 }
 
-type ChannelStorage struct {
-	HealthcheckChan chan bool
-	PingChan        chan bool
-}
-
 type UptimeNotification struct {
 	ProjectKey string `json:"project_key"`
 	Service    string `json:"service"`

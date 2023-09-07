@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func pingLoop(done <-chan bool, projectName string, ips []database.Ip) {
+func PingLoop(done <-chan bool, projectName string, ips []database.Ip) {
 	for {
 		select {
 		// when channel closes, this function terminates, allows to avoid goroutine leaks

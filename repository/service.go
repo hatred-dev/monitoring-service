@@ -40,8 +40,8 @@ func (s *serviceRepository) CreateService(project database.Project, service data
 
 func (s *serviceRepository) UpdateService(project database.Project, serviceName string, service database.Service) error {
 	filter := bson.D{
-		{"project_id", project.ID},
-		{"service_name", serviceName},
+		{Key: "project_id", Value: project.ID},
+		{Key: "service_name", Value: serviceName},
 	}
 	update := bson.M{"$set": service}
 	res, err := s.UpdateOne(context.Background(), filter, update)
@@ -56,8 +56,8 @@ func (s *serviceRepository) UpdateService(project database.Project, serviceName 
 
 func (s *serviceRepository) DeleteService(project database.Project, serviceName string) error {
 	filter := bson.D{
-		{"project_id", project.ID},
-		{"service_name", serviceName},
+		{Key: "project_id", Value: project.ID},
+		{Key: "service_name", Value: serviceName},
 	}
 	_, err := s.DeleteOne(context.Background(), filter)
 	if err != nil {
