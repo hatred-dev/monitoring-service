@@ -11,16 +11,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const Lookup = "$lookup"
+
 func (p *projectRepository) GetProjects() []database.Project {
 	var projects []database.Project
 	pipeline := mongo.Pipeline{
-		{{Key: "$lookup", Value: bson.M{
+		{{Key: Lookup, Value: bson.M{
 			"from":         "ips",
 			"localField":   "_id",
 			"foreignField": "project_id",
 			"as":           "ips",
 		}}},
-		{{Key: "$lookup", Value: bson.M{
+		{{Key: Lookup, Value: bson.M{
 			"from":         "services",
 			"localField":   "_id",
 			"foreignField": "project_id",
@@ -54,13 +56,13 @@ func (p *projectRepository) GetProjectByName(projectName string) (database.Proje
 	var project database.Project
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.M{"project_name": projectName}}},
-		{{Key: "$lookup", Value: bson.M{
+		{{Key: Lookup, Value: bson.M{
 			"from":         "ips",
 			"localField":   "_id",
 			"foreignField": "project_id",
 			"as":           "ips",
 		}}},
-		{{Key: "$lookup", Value: bson.M{
+		{{Key: Lookup, Value: bson.M{
 			"from":         "services",
 			"localField":   "_id",
 			"foreignField": "project_id",
