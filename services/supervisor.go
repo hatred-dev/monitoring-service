@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
 	"net/http"
@@ -15,7 +16,7 @@ type Supervisor struct {
 }
 
 type ChannelStorage struct {
-	HealthcheckChan chan bool
+	HealthCheckChan chan bool
 	PingChan        chan bool
 }
 
@@ -40,7 +41,8 @@ func (s *Supervisor) CreateStorage(project database.Project) {
 		storage.StartPingJob(project.ProjectName, project.Ips)
 	}
 	if !project.ServicesEmpty() {
-		storage.StartHealthcheckJob(s.client, project.ProjectName, project.Services)
+		fmt.Println(project.Services)
+		storage.StartHealthCheckJob(s.client, project.ProjectName, project.Services)
 	}
 
 	s.channels[project.ProjectName] = storage
@@ -68,8 +70,8 @@ func StartServices() {
 }
 
 func (c *ChannelStorage) Close() {
-	if c.HealthcheckChan != nil {
-		close(c.HealthcheckChan)
+	if c.HealthCheckChan != nil {
+		close(c.HealthCheckChan)
 	}
 	if c.PingChan != nil {
 		close(c.PingChan)
@@ -86,12 +88,12 @@ func (c *ChannelStorage) StartPingJob(projectName string, ips []database.Ip) {
 	go PingLoop(ch, projectName, ips)
 }
 
-func (c *ChannelStorage) CreateHealthcheckChannel() chan bool {
-	c.HealthcheckChan = make(chan bool, 1)
-	return c.HealthcheckChan
+func (c *ChannelStorage) CreateHealthCheckChannel() chan bool {
+	c.HealthCheckChan = make(chan bool, 1)
+	return c.HealthCheckChan
 }
 
-func (c *ChannelStorage) StartHealthcheckJob(client *http.Client, projectName string, svc []database.Service) {
-	ch := c.CreateHealthcheckChannel()
-	go HealthcheckLoop(ch, client, projectName, svc)
+func (c *ChannelStorage) StartHealthCheckJob(client *http.Client, projectName string, svc []database.Service) {
+	ch := c.CreateHealthCheckChannel()
+	go HealthCheckLoop(ch, client, projectName, svc)
 }

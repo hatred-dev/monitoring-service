@@ -12,7 +12,7 @@ import (
 	"net/url"
 )
 
-func HealthcheckLoop(done <-chan bool, client *http.Client, projectName string, services []database.Service) {
+func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, services []database.Service) {
 	// cycle allows to iterate through array infinitely
 	for {
 		select {
