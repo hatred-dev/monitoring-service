@@ -31,7 +31,14 @@ func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, 
 func healthCheck(projectName string, service *database.Service, client *http.Client) {
 	var message string
 	active := repository.ServiceRepository.GetServiceState(service)
-	resp, err := client.Get(service.Url)
+	var resp *http.Response
+	var err error
+	for i := 0; i <= 3; i++ {
+		resp, err = client.Get(service.Url)
+		if resp != nil && resp.StatusCode == http.StatusOK {
+			break
+		}
+	}
 
 	defer func() {
 		if message != "" {
