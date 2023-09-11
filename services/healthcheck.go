@@ -46,7 +46,6 @@ func healthCheck(projectName string, service *database.Service, client *http.Cli
 		if resp != nil {
 			_ = resp.Body.Close()
 		}
-		logger.Log.Infof("%s %s checked.", projectName, service.ServiceName)
 	}()
 
 	var dnsError *net.DNSError
