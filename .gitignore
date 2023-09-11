@@ -3,3 +3,4 @@ monitoring-service.iml
 .env
 tmp
 .air.toml
+.vscode
