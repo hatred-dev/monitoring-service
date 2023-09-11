@@ -79,7 +79,7 @@ func SendNotifications(projectName, serviceName, message string, active bool) {
 	if err != nil {
 		logger.Log.Warn(err)
 	}
-	err = SendUptimeNotification(projectName, serviceName, !active)
+	err = SendUptimeNotification(projectName, serviceName, active)
 	if err != nil {
 		logger.Log.Warn(err)
 	}
