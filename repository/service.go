@@ -3,12 +3,13 @@ package repository
 import (
 	"context"
 	"errors"
+	"monitoring-service/logger"
+	"monitoring-service/models/database"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"monitoring-service/logger"
-	"monitoring-service/models/database"
 )
 
 func (s *serviceRepository) GetServices(project *database.Project) []database.Service {
@@ -73,7 +74,7 @@ func (s *serviceRepository) GetServiceState(service *database.Service) bool {
 	}
 	err := s.FindOne(context.Background(), filter).Decode(&serviceObj)
 	if err != nil {
-		return false
+		logger.Log.Warn(err)
 	}
 	return serviceObj.Active
 }

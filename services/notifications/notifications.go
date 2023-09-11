@@ -70,7 +70,7 @@ func SendUptimeNotification(projectKey, service string, state bool) error {
 		return err
 	}
 	response, _ := io.ReadAll(resp.Body)
-	logger.Log.Info(response)
+	logger.Log.Info(string(response))
 	return nil
 }
 
