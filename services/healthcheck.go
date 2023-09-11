@@ -31,14 +31,7 @@ func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, 
 func healthCheck(projectName string, service *database.Service, client *http.Client) {
 	var message string
 	active := repository.ServiceRepository.GetServiceState(service)
-	var resp *http.Response
-	var err error
-	for i := 0; i <= 3; i++ {
-		resp, err = client.Get(service.Url)
-		if resp != nil && resp.StatusCode == http.StatusOK {
-			break
-		}
-	}
+	resp, err := requestWithRetries(client, service.Url)
 
 	defer func() {
 		if message != "" {
@@ -75,4 +68,16 @@ func healthCheck(projectName string, service *database.Service, client *http.Cli
 	if resp.StatusCode == http.StatusInternalServerError && active {
 		message = fmt.Sprintf("🚫️WARNING🚫️\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.ServiceName)
 	}
+}
+
+func requestWithRetries(client *http.Client, url string) (*http.Response, error) {
+	var resp *http.Response
+	var err error
+	for i := 0; i <= 3; i++ {
+		resp, err = client.Get(url)
+		if resp != nil && resp.StatusCode == http.StatusOK {
+			break
+		}
+	}
+	return resp, err
 }
