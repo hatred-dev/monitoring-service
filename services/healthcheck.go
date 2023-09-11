@@ -14,7 +14,6 @@ import (
 
 func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, services []database.Service) {
 	// cycle allows to iterate through array infinitely
-	fmt.Println(services)
 	for {
 		select {
 		// when channel closes, this function terminates, allows to avoid goroutine leaks

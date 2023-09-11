@@ -64,6 +64,7 @@ func (s *Supervisor) ReloadServices() {
 }
 
 func StartServices() {
+	SupervisorObject.SetupClient()
 	SupervisorObject.LoadJobs()
 }
 

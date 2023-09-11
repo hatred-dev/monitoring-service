@@ -75,12 +75,12 @@ func SendUptimeNotification(projectKey, service string, state bool) error {
 }
 
 func SendNotifications(projectName, serviceName, message string, active bool) {
-	err := SendTelegramNotification(message)
-	if err != nil {
-		logger.Log.Warn(err)
-	}
-	err = SendUptimeNotification(projectName, serviceName, !active)
-	if err != nil {
-		logger.Log.Warn(err)
-	}
+	// err := SendTelegramNotification(message)
+	// if err != nil {
+	// 	logger.Log.Warn(err)
+	// }
+	// err = SendUptimeNotification(projectName, serviceName, !active)
+	// if err != nil {
+	// 	logger.Log.Warn(err)
+	// }
 }
