@@ -28,11 +28,6 @@ func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, 
 	}
 }
 
-type StatusState struct {
-	StatusCode int
-	Active     bool
-}
-
 func healthCheck(projectName string, service *database.Service, client *http.Client) {
 	var message string
 	active := repository.ServiceRepository.GetServiceState(service)
@@ -63,16 +58,14 @@ func healthCheck(projectName string, service *database.Service, client *http.Cli
 	if resp == nil {
 		return
 	}
-	statusState := StatusState{
-		StatusCode: resp.StatusCode,
-		Active:     active,
-	}
-	switch statusState {
-	case StatusState{StatusCode: http.StatusOK, Active: !active}:
+
+	if resp.StatusCode == http.StatusOK && !active {
 		message = fmt.Sprintf("🌀GOOD NEWS🌀\n`%s %s`\nIS UP", projectName, service.ServiceName)
-	case StatusState{StatusCode: http.StatusNotFound, Active: active}:
+	}
+	if resp.StatusCode == http.StatusNotFound && active {
 		message = fmt.Sprintf("⚠️WARNING⚠️\n`%s %s`\nIS INACCESSIBLE", projectName, service.ServiceName)
-	case StatusState{StatusCode: http.StatusInternalServerError, Active: active}:
+	}
+	if resp.StatusCode == http.StatusInternalServerError && active {
 		message = fmt.Sprintf("🚫️WARNING🚫️\n`%s %s`\nRETURNED 500 STATUS CODE", projectName, service.ServiceName)
 	}
 }
