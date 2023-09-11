@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"monitoring-service/models/database"
 	"monitoring-service/repository"
 	"net/http"
@@ -41,7 +40,6 @@ func (s *Supervisor) CreateStorage(project database.Project) {
 		storage.StartPingJob(project.ProjectName, project.Ips)
 	}
 	if !project.ServicesEmpty() {
-		fmt.Println(project.Services)
 		storage.StartHealthCheckJob(s.client, project.ProjectName, project.Services)
 	}
 

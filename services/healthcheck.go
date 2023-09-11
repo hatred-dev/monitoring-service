@@ -14,6 +14,7 @@ import (
 
 func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, services []database.Service) {
 	// cycle allows to iterate through array infinitely
+	fmt.Println(services)
 	for {
 		select {
 		// when channel closes, this function terminates, allows to avoid goroutine leaks
@@ -22,7 +23,7 @@ func HealthCheckLoop(done <-chan bool, client *http.Client, projectName string, 
 			return
 		default:
 			for _, v := range services {
-				healthcheck(projectName, &v, client)
+				healthCheck(projectName, &v, client)
 			}
 		}
 	}
@@ -33,7 +34,7 @@ type StatusState struct {
 	Active     bool
 }
 
-func healthcheck(projectName string, service *database.Service, client *http.Client) {
+func healthCheck(projectName string, service *database.Service, client *http.Client) {
 	var message string
 	active := repository.ServiceRepository.GetServiceState(service)
 	resp, err := client.Get(service.Url)
