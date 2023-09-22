@@ -1,7 +1,3 @@
 ## Monitoring Service
 
-#### TODO:
-
-* Migrate to MongoDB
-* Place supervisor in its own place
-* Make better reloading to avoid restarting whole service
+Monitoring service for sending notifications to telegram channel.
