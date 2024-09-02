@@ -1,0 +1,8 @@
+.idea
+.air.toml
+.gitlab-ci.yml
+.gitignore
+tmp
+.vscode
+README.md
+*.{yaml,yml}
